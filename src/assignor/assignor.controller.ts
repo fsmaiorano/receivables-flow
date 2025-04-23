@@ -6,7 +6,7 @@ import { CreateAssignorRequest } from './dtos/create-assignor.request';
 export class AssignorController {
   constructor(private assignorService: AssignorService) {}
 
-  @Post('/assignor')
+  @Post('')
   createAssignor(@Body() createAssignorRequest: CreateAssignorRequest) {
     return this.assignorService.createAssignor(createAssignorRequest);
   }

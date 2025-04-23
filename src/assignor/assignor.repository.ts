@@ -13,7 +13,19 @@ export class AssignorRepository implements AssignorRepositoryInterface {
     });
 
     if (!assignor) {
-      throw new NotFoundException(`Assignor with ID ${id} not found`);
+      return null;
+    }
+
+    return assignor;
+  }
+
+  async findByEmail(email: string): Promise<AssignorEntity | null> {
+    const assignor = await this.prismaService.assignor.findFirst({
+      where: { email },
+    });
+
+    if (!assignor) {
+      throw new NotFoundException(`Assignor with email ${email} not found`);
     }
 
     return assignor;

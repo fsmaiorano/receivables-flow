@@ -20,6 +20,15 @@ describe('AssignorRepository', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
         }),
+        findUnique: jest.fn().mockResolvedValue({
+          id: '1',
+          document: '12345678900',
+          email: 'assignor@example.com',
+          phone: '+5511999999999',
+          name: 'John Doe',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }),
       },
     } as unknown as PrismaService;
 
@@ -59,5 +68,12 @@ describe('AssignorRepository', () => {
     await expect(
       assignorRepository.create(invalidAssignorData),
     ).rejects.toThrow();
+  });
+
+  it('should find an assignor by ID', async () => {
+    const assignorId = '1';
+    const result = await assignorRepository.findById(assignorId);
+    expect(result).toBeDefined();
+    expect(result.id).toEqual(assignorId);
   });
 });

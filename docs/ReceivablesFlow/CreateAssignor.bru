@@ -1,0 +1,20 @@
+meta {
+  name: CreateAssignor
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/assignor
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "document": "111.222.333-44",
+    "email": "fsmaiorano@gmail.com",
+    "phone": "+5511999999999",
+    "name": "Fábio Maiorano"
+  }
+}
