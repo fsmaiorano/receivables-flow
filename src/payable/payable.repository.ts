@@ -12,7 +12,7 @@ export class PayableRepository {
     });
   }
 
-  async getPayableDetails(id: string) {
+  async getById(id: string) {
     const payableDetails = await this.prismaService.payable.findUnique({
       where: { id },
     });

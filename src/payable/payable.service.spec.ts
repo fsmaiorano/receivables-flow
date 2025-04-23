@@ -8,7 +8,7 @@ describe('PayableService', () => {
 
   beforeEach(async () => {
     mockPayableRepository = {
-      getPayableDetails: jest.fn().mockResolvedValue({
+      getById: jest.fn().mockResolvedValue({
         id: '123',
         value: 100,
         emissionDate: new Date(),
@@ -48,7 +48,7 @@ describe('PayableService', () => {
 
     const result = await service.getPayableDetails(id);
 
-    expect(mockPayableRepository.getPayableDetails).toHaveBeenCalledWith(id);
+    expect(mockPayableRepository.getById).toHaveBeenCalledWith(id);
     expect(result).toEqual(mockPayable);
   });
 });

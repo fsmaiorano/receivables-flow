@@ -16,16 +16,18 @@ describe('PayableRepository', () => {
       const id = '123';
       const mockPayable = {
         id: '123',
-        value: 100,
+        value: 100 as any, // Cast to any to bypass Decimal type check
         emissionDate: new Date(),
         assignorId: 'abc',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       jest
         .spyOn(prismaService.payable, 'findUnique')
         .mockResolvedValue(mockPayable);
 
-      const result = await payableRepository.getPayableDetails(id);
+      const result = await payableRepository.getById(id);
 
       expect(result).toEqual(mockPayable);
     });
@@ -35,7 +37,7 @@ describe('PayableRepository', () => {
 
       jest.spyOn(prismaService.payable, 'findUnique').mockResolvedValue(null);
 
-      await expect(payableRepository.getPayableDetails(id)).rejects.toThrow(
+      await expect(payableRepository.getById(id)).rejects.toThrow(
         NotFoundException,
       );
     });

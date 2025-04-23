@@ -1,12 +1,18 @@
 import { AssignorService } from './assignor.service';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { CreateAssignorRequest } from './dtos/create-assignor.request';
 
 @Controller('assignor')
 export class AssignorController {
   constructor(private assignorService: AssignorService) {}
 
+  @Post('/assignor')
+  createAssignor(@Body() createAssignorRequest: CreateAssignorRequest) {
+    return this.assignorService.createAssignor(createAssignorRequest);
+  }
+
   @Get('/integrations/assignor/:id')
   getAssignorById(@Param('id') id: string) {
-    console.log(id);
+    return this.assignorService.verifyExists(id);
   }
 }
