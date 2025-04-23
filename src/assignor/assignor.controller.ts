@@ -13,6 +13,8 @@ export class AssignorController {
 
   @Get('/integrations/assignor/:id')
   getAssignorById(@Param('id') id: string) {
-    return this.assignorService.verifyExists(id);
+    return this.assignorService.verifyExists({
+      assignorId: id,
+    });
   }
 }

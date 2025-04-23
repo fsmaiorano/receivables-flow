@@ -1,8 +1,16 @@
 import { CreateAssignorResponse } from 'src/assignor/dtos/create-assignor.response';
 import { AssignorEntity } from '../entities/assignor.entity';
+import { CreateAssignorRequest } from 'src/assignor/dtos/create-assignor.request';
+
+export interface VerifyExistsParams {
+  assignorId?: string;
+  assignorEmail?: string;
+}
 
 export interface AssignorServiceInterface {
-  verifyExists(assignorId: string): Promise<boolean>;
-  createAssignor(assignorData: any): Promise<CreateAssignorResponse>;
+  verifyExists(params: VerifyExistsParams): Promise<boolean>;
+  createAssignor(
+    request: CreateAssignorRequest,
+  ): Promise<CreateAssignorResponse>;
   getAssignorById(assignorId: string): Promise<AssignorEntity | null>;
 }
