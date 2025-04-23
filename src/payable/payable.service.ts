@@ -20,9 +20,9 @@ export class PayableService {
       throw new Error('Assignor not found');
     }
 
-    const mapped = PayableMapper.toPersistence(createPayableRequest);
+    const prismaPayable = PayableMapper.toPersistence(createPayableRequest);
 
-    return await this.payableRepository.create(mapped);
+    return await this.payableRepository.create(prismaPayable);
   }
 
   async getById(id: string) {
