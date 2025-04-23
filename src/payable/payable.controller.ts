@@ -1,0 +1,50 @@
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  NotFoundException,
+  Body,
+} from '@nestjs/common';
+import { PayableService } from './payable.service';
+import { CreatePayableRequest } from './dtos/create-payable.request';
+import { CreatePayableResponse } from './dtos/create-payable.response';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
+
+@ApiTags('Payable')
+@Controller('payable')
+export class PayableController {
+  constructor(private payableService: PayableService) {}
+
+  @Post('/integrations/payable')
+  @ApiOperation({ summary: 'Create a new payable' })
+  async createPayable(
+    @Body() createPayableRequest: CreatePayableRequest,
+  ): Promise<CreatePayableResponse> {
+    const payable =
+      await this.payableService.createPayable(createPayableRequest);
+
+    return {
+      id: payable.id,
+      value: payable.value,
+      emissionDate: payable.emissionDate,
+      assignorId: payable.assignorId,
+      createdAt: payable.createdAt,
+      updatedAt: payable.updatedAt,
+    };
+  }
+
+  @Get('/integrations/payable/:id')
+  @ApiOperation({ summary: 'Get payable by ID' })
+  async getPayableById(@Param('id') id: string) {
+    try {
+      const result = await this.payableService.getPayableDetails(id);
+      return result;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw error;
+    }
+  }
+}
