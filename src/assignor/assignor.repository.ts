@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Assignor } from 'generated/prisma';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { AssignorRepositoryInterface } from './domain/interfaces/assignor-repository.interface';
 import { AssignorEntity } from './domain/entities/assignor.entity';
 

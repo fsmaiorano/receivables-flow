@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AssignorController } from './assignor.controller';
 import { AssignorService } from './assignor.service';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { AssignorRepository } from './assignor.repository';
 
 @Module({
@@ -14,6 +14,6 @@ import { AssignorRepository } from './assignor.repository';
     },
     PrismaService,
   ],
-  exports: [AssignorService], // Exportando o serviço para ser usado por outros módulos
+  exports: [AssignorService],
 })
 export class AssignorModule {}

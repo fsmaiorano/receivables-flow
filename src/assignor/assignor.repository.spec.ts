@@ -1,28 +1,46 @@
 import { PrismaService } from '../prisma.service';
 import { AssignorRepository } from './assignor.repository';
+import { AssignorService } from './assignor.service';
 import { CreateAssignorRequest } from './dtos/create-assignor.request';
 
 describe('AssignorRepository', () => {
+  let assignorService: AssignorService;
   let assignorRepository: AssignorRepository;
   let prismaService: PrismaService;
 
   beforeEach(() => {
-    prismaService = new PrismaService();
+    prismaService = {
+      assignor: {
+        create: jest.fn().mockResolvedValue({
+          id: '1',
+          document: '12345678900',
+          email: 'assignor@example.com',
+          phone: '+5511999999999',
+          name: 'John Doe',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }),
+      },
+    } as unknown as PrismaService;
+
     assignorRepository = new AssignorRepository(prismaService);
+    assignorService = new AssignorService(assignorRepository);
   });
 
   it('should be defined', () => {
+    expect(assignorService).toBeDefined();
     expect(assignorRepository).toBeDefined();
   });
 
-  it('should create an assignor', async () => {
-    const assignorData: CreateAssignorRequest = {
+  it('should create an assignor successfully', async () => {
+    const validAssignorData: CreateAssignorRequest = {
       document: '12345678900',
       email: 'assignor@example.com',
       phone: '+5511999999999',
       name: 'John Doe',
     };
-    const result = await assignorRepository.create(assignorData);
+
+    const result = await assignorRepository.create(validAssignorData);
     expect(result).toBeDefined();
   });
 
@@ -33,6 +51,11 @@ describe('AssignorRepository', () => {
       phone: 'not-a-phone',
       name: '',
     };
+
+    jest
+      .spyOn(prismaService.assignor, 'create')
+      .mockRejectedValueOnce(new Error('Invalid data'));
+
     await expect(
       assignorRepository.create(invalidAssignorData),
     ).rejects.toThrow();

@@ -38,7 +38,7 @@ export class PayableController {
   @ApiOperation({ summary: 'Get payable by ID' })
   async getPayableById(@Param('id') id: string) {
     try {
-      const result = await this.payableService.getPayableDetails(id);
+      const result = await this.payableService.getById(id);
       return result;
     } catch (error) {
       if (error instanceof NotFoundException) {

@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PayableRepository } from './payable.repository';
 import { CreatePayableRequest } from './dtos/create-payable.request';
-import { AssignorService } from 'src/assignor/assignor.service';
+import { AssignorService } from '../assignor/assignor.service';
+import { PayableMapper } from './infrastructure/mappers/payable.mapper';
 
 @Injectable()
 export class PayableService {
@@ -19,10 +20,12 @@ export class PayableService {
       throw new Error('Assignor not found');
     }
 
-    return await this.payableRepository.create(createPayableRequest);
+    const mapped = PayableMapper.toPersistence(createPayableRequest);
+
+    return await this.payableRepository.create(mapped);
   }
 
-  async getPayableDetails(id: string) {
+  async getById(id: string) {
     return await this.payableRepository.getById(id);
   }
 }

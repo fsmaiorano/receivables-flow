@@ -1,3 +1,4 @@
+import { CreateAssignorRequest } from 'src/assignor/dtos/create-assignor.request';
 import { Assignor as PrismaAssignor } from '../../../../generated/prisma';
 import { AssignorEntity } from '../../domain/entities/assignor.entity';
 
@@ -15,8 +16,8 @@ export class AssignorMapper {
   }
 
   static toPersistence(
-    assignor: AssignorEntity,
-  ): Omit<PrismaAssignor, 'id' | 'createdAt' | 'updatedAt' | 'Payable'> {
+    assignor: AssignorEntity | CreateAssignorRequest,
+  ): Omit<PrismaAssignor, 'id' | 'createdAt' | 'updatedAt'> {
     return {
       document: assignor.document,
       email: assignor.email,
