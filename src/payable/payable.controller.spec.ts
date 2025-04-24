@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PayableController } from './payable.controller';
 import { PayableService } from './payable.service';
-import { PayableRepository } from './payable.repository';
 
 describe('PayableController', () => {
   let controller: PayableController;
 
-  const mockPayableRepository = {
-    getPayableDetails: jest.fn(),
-  };
-
   const mockPayableService = {
     getPayableDetails: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    findOne: jest.fn(),
+    find: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -21,10 +21,6 @@ describe('PayableController', () => {
         {
           provide: PayableService,
           useValue: mockPayableService,
-        },
-        {
-          provide: PayableRepository,
-          useValue: mockPayableRepository,
         },
       ],
     }).compile();

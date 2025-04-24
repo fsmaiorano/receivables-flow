@@ -1,7 +1,7 @@
-import { PayableEntity } from 'src/payable/domain/entities/payable.entity';
+import { PayableEntity } from '../../../payable/domain/entities/payable.entity';
 import { Payable as PrismaPayable } from '../../../../generated/prisma';
 import { Decimal } from 'decimal.js';
-import { CreatePayableRequest } from 'src/payable/dtos/create-payable.request';
+import { CreatePayableRequest } from '../../../payable/dtos/create-payable.request';
 
 export class PayableMapper {
   static toDomain(prismaPayable: PrismaPayable): PayableEntity {

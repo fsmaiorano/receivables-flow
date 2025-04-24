@@ -1,6 +1,6 @@
-import { CreateAssignorResponse } from 'src/assignor/dtos/create-assignor.response';
+import { CreateAssignorResponse } from '../../../assignor/dtos/create-assignor.response';
 import { AssignorEntity } from '../entities/assignor.entity';
-import { CreateAssignorRequest } from 'src/assignor/dtos/create-assignor.request';
+import { CreateAssignorRequest } from '../../../assignor/dtos/create-assignor.request';
 
 export interface VerifyExistsParams {
   assignorId?: string;

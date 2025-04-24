@@ -1,5 +1,3 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { AssignorRepositoryInterface } from './domain/interfaces/assignor-repository.interface';
 import {
   AssignorServiceInterface,
   VerifyExistsParams,
@@ -7,15 +5,16 @@ import {
 import { AssignorEntity } from './domain/entities/assignor.entity';
 import { CreateAssignorResponse } from './dtos/create-assignor.response';
 import { CreateAssignorRequest } from './dtos/create-assignor.request';
+import { PrismaService } from '../prisma.service';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AssignorService implements AssignorServiceInterface {
-  constructor(
-    @Inject('AssignorRepository')
-    private assignorRepository: AssignorRepositoryInterface,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
   async getAssignorById(assignorId: string): Promise<AssignorEntity | null> {
-    const assignor = await this.assignorRepository.findById(assignorId);
+    const assignor = await this.prismaService.assignor.findUnique({
+      where: { id: assignorId },
+    });
     return assignor;
   }
 
@@ -24,11 +23,15 @@ export class AssignorService implements AssignorServiceInterface {
     assignorEmail,
   }: VerifyExistsParams = {}): Promise<boolean> {
     if (assignorId) {
-      const assignor = await this.assignorRepository.findById(assignorId);
+      const assignor = await this.prismaService.assignor.findUnique({
+        where: { id: assignorId },
+      });
       return assignor !== null;
     }
     if (assignorEmail) {
-      const assignor = await this.assignorRepository.findByEmail(assignorEmail);
+      const assignor = await this.prismaService.assignor.findFirst({
+        where: { email: assignorEmail },
+      });
       return assignor !== null;
     }
     return false;
@@ -45,7 +48,9 @@ export class AssignorService implements AssignorServiceInterface {
       throw new Error('Assignor already exists');
     }
 
-    const assignor = await this.assignorRepository.create(request);
+    const assignor = await this.prismaService.assignor.create({
+      data: request,
+    });
     return assignor;
   }
 }
