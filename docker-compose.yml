@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: receivables-flow-api
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/prisma/db/production.db
+      - JWT_SECRET=your-production-jwt-secret
+    volumes:
+      - sqlite_data:/app/prisma/db
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sqlite_data:
+    driver: local
