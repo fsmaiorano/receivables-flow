@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { SignInRequest } from './dto/sign.request';
-import { PrismaService } from '../shared/prisma.service';
 import { SignInResponse } from './dto/sign.response';
 import { Result } from '../shared/dto/result.generic';
 import { HttpStatusCode } from 'axios';
@@ -11,7 +10,6 @@ import { HttpStatusCode } from 'axios';
 export class AuthService {
   constructor(
     private userService: UserService,
-    private prismaService: PrismaService,
     private jwtService: JwtService,
   ) {}
 

@@ -1,25 +1,19 @@
-import { PayableEntity } from '../../../payable/domain/entities/payable.entity';
-import { Payable as PrismaPayable } from '../../../../generated/prisma';
-import { Decimal } from 'decimal.js';
-import { CreatePayableRequest } from '../../../payable/dtos/create-payable.request';
+import { Payable } from '../../domain/entities/payable.entity';
+import { CreatePayableRequest } from '../../dtos/create-payable.request';
 
 export class PayableMapper {
-  static toDomain(prismaPayable: PrismaPayable): PayableEntity {
-    return {
-      id: prismaPayable.id,
-      value: prismaPayable.value,
-      emissionDate: prismaPayable.emissionDate,
-      assignorId: prismaPayable.assignorId,
-      createdAt: prismaPayable.createdAt,
-      updatedAt: prismaPayable.updatedAt,
-    };
+  static toDomain(entity: Payable): Payable {
+    return entity;
   }
 
   static toPersistence(
-    payable: PayableEntity | CreatePayableRequest,
-  ): Omit<PrismaPayable, 'id' | 'createdAt' | 'updatedAt'> {
+    payable: Partial<Payable> | CreatePayableRequest,
+  ): Partial<Payable> {
     return {
-      value: new Decimal(payable.value),
+      value:
+        typeof payable.value === 'string'
+          ? parseFloat(payable.value)
+          : payable.value,
       emissionDate: payable.emissionDate,
       assignorId: payable.assignorId,
     };

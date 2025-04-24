@@ -2,13 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { CreatePayableRequest } from './dtos/create-payable.request';
 import { PayableMapper } from './infrastructure/mappers/payable.mapper';
 import { AssignorService } from '../assignor/assignor.service';
-import { PrismaService } from '../shared/prisma.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Payable } from './domain/entities/payable.entity';
 
 @Injectable()
 export class PayableService {
   constructor(
     private readonly assignorService: AssignorService,
-    private readonly prismaService: PrismaService,
+    @InjectRepository(Payable)
+    private readonly payableRepository: Repository<Payable>,
   ) {}
 
   async createPayable(createPayableRequest: CreatePayableRequest) {
@@ -20,12 +23,13 @@ export class PayableService {
       throw new Error('Assignor not found');
     }
 
-    const prismaPayable = PayableMapper.toPersistence(createPayableRequest);
+    const payableData = PayableMapper.toPersistence(createPayableRequest);
+    const newPayable = this.payableRepository.create(payableData);
 
-    return await this.prismaService.payable.create({ data: prismaPayable });
+    return await this.payableRepository.save(newPayable);
   }
 
   async getById(id: string) {
-    return await this.prismaService.payable.findFirst({ where: { id } });
+    return await this.payableRepository.findOne({ where: { id } });
   }
 }

@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import Decimal from 'decimal.js';
 
 export class CreatePayableRequest {
   @ApiProperty({
     description: 'The value of the payable',
     example: 100.5,
-    type: Decimal,
+    type: Number,
   })
-  value: Decimal;
+  value: number;
 
   @ApiProperty({
     description: 'The emission date of the payable',

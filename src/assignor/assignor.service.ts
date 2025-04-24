@@ -1,8 +1,9 @@
-import { AssignorEntity } from './domain/entities/assignor.entity';
+import { Assignor } from './domain/entities/assignor.entity';
 import { CreateAssignorResponse } from './dtos/create-assignor.response';
 import { CreateAssignorRequest } from './dtos/create-assignor.request';
-import { PrismaService } from '../shared/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 export interface VerifyExistsParams {
   assignorId?: string;
@@ -11,12 +12,15 @@ export interface VerifyExistsParams {
 
 @Injectable()
 export class AssignorService {
-  constructor(private prismaService: PrismaService) {}
-  async getAssignorById(assignorId: string): Promise<AssignorEntity | null> {
-    const assignor = await this.prismaService.assignor.findUnique({
+  constructor(
+    @InjectRepository(Assignor)
+    private assignorRepository: Repository<Assignor>,
+  ) {}
+
+  async getAssignorById(assignorId: string): Promise<Assignor | null> {
+    return this.assignorRepository.findOne({
       where: { id: assignorId },
     });
-    return assignor;
   }
 
   async verifyExists({
@@ -24,13 +28,13 @@ export class AssignorService {
     assignorEmail,
   }: VerifyExistsParams = {}): Promise<boolean> {
     if (assignorId) {
-      const assignor = await this.prismaService.assignor.findUnique({
+      const assignor = await this.assignorRepository.findOne({
         where: { id: assignorId },
       });
       return assignor !== null;
     }
     if (assignorEmail) {
-      const assignor = await this.prismaService.assignor.findFirst({
+      const assignor = await this.assignorRepository.findOne({
         where: { email: assignorEmail },
       });
       return assignor !== null;
@@ -49,9 +53,8 @@ export class AssignorService {
       throw new Error('Assignor already exists');
     }
 
-    const assignor = await this.prismaService.assignor.create({
-      data: request,
-    });
+    const newAssignor = this.assignorRepository.create(request);
+    const assignor = await this.assignorRepository.save(newAssignor);
     return assignor;
   }
 }

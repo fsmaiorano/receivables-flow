@@ -1,4 +1,3 @@
-import { Decimal } from 'generated/prisma/runtime/library';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePayableResponse {
@@ -12,7 +11,7 @@ export class CreatePayableResponse {
     description: 'The value of the payable',
     example: 100.5,
   })
-  value: Decimal;
+  value: number;
 
   @ApiProperty({
     description: 'The emission date of the payable',
