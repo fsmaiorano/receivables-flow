@@ -6,7 +6,7 @@ import { jwtConstants } from './jwt/constants';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt/jwt.strategy';
-import { SharedModule } from 'src/shared/shared.module';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
   providers: [AuthService, JwtStrategy],

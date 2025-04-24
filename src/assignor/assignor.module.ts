@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AssignorController } from './assignor.controller';
 import { AssignorService } from './assignor.service';
-import { SharedModule } from 'src/shared/shared.module';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
   imports: [SharedModule],

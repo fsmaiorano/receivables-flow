@@ -3,6 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { SignInRequest } from './dto/sign.request';
 import { PrismaService } from '../shared/prisma.service';
+import { SignInResponse } from './dto/sign.response';
+import { Result } from '../shared/dto/result.generic';
+import { HttpStatusCode } from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +15,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
+  private async validateUser(username: string, password: string): Promise<any> {
     const user = await this.userService.findOne(username);
     if (user && user.password === password) {
       return user;
@@ -20,23 +23,35 @@ export class AuthService {
     return null;
   }
 
-  async signIn(request: SignInRequest) {
-    const user = await this.prismaService.user.findUnique({
-      where: { username: request.username },
-    });
+  async signIn(request: SignInRequest): Promise<Result<SignInResponse>> {
+    try {
+      const user = await this.validateUser(request.username, request.password);
 
-    if (!user) {
-      throw new Error('User not found');
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const payload = { username: user.username, sub: user.id };
+
+      const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+      const refreshToken = this.jwtService.sign(
+        {
+          ...payload,
+          tokenType: 'refresh',
+        },
+        { expiresIn: '7d' },
+      );
+
+      return Result.success<SignInResponse>(
+        {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        },
+        HttpStatusCode.Ok,
+      );
+    } catch (error) {
+      throw new Error('Authentication failed');
     }
-    if (user.password !== request.password) {
-      throw new Error('Invalid password');
-    }
-
-    const payload = { username: user.username, sub: user.id };
-
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
   }
 
   async signOut(user: any) {
