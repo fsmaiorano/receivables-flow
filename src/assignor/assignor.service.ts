@@ -1,15 +1,16 @@
-import {
-  AssignorServiceInterface,
-  VerifyExistsParams,
-} from './domain/interfaces/assignor-service.interface';
 import { AssignorEntity } from './domain/entities/assignor.entity';
 import { CreateAssignorResponse } from './dtos/create-assignor.response';
 import { CreateAssignorRequest } from './dtos/create-assignor.request';
 import { PrismaService } from '../prisma.service';
 import { Injectable } from '@nestjs/common';
 
+export interface VerifyExistsParams {
+  assignorId?: string;
+  assignorEmail?: string;
+}
+
 @Injectable()
-export class AssignorService implements AssignorServiceInterface {
+export class AssignorService {
   constructor(private prismaService: PrismaService) {}
   async getAssignorById(assignorId: string): Promise<AssignorEntity | null> {
     const assignor = await this.prismaService.assignor.findUnique({
