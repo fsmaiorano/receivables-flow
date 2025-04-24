@@ -11,7 +11,7 @@ import { PayableService } from './payable.service';
 import { CreatePayableRequest } from './dtos/create-payable.request';
 import { CreatePayableResponse } from './dtos/create-payable.response';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 
 @ApiTags('Payable')
 @Controller('payable')

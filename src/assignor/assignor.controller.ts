@@ -1,7 +1,7 @@
 import { AssignorService } from './assignor.service';
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CreateAssignorRequest } from './dtos/create-assignor.request';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 
 @Controller('assignor')
 export class AssignorController {
