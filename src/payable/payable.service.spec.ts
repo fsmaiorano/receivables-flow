@@ -3,7 +3,7 @@ import { AssignorService } from '../assignor/assignor.service';
 import { PayableService } from './payable.service';
 import Decimal from 'decimal.js';
 import { PayableMapper } from './infrastructure/mappers/payable.mapper';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../shared/prisma.service';
 
 jest.mock('./infrastructure/mappers/payable.mapper');
 

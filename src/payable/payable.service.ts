@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePayableRequest } from './dtos/create-payable.request';
 import { PayableMapper } from './infrastructure/mappers/payable.mapper';
 import { AssignorService } from '../assignor/assignor.service';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../shared/prisma.service';
 
 @Injectable()
 export class PayableService {

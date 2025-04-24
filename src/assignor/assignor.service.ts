@@ -1,7 +1,7 @@
 import { AssignorEntity } from './domain/entities/assignor.entity';
 import { CreateAssignorResponse } from './dtos/create-assignor.response';
 import { CreateAssignorRequest } from './dtos/create-assignor.request';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../shared/prisma.service';
 import { Injectable } from '@nestjs/common';
 
 export interface VerifyExistsParams {

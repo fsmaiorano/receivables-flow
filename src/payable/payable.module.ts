@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { PayableController } from './payable.controller';
 import { PayableService } from './payable.service';
-import { PrismaService } from '../prisma.service';
 import { AssignorModule } from '../assignor/assignor.module';
+import { SharedModule } from 'src/shared/shared.module';
 
 @Module({
-  imports: [AssignorModule],
+  imports: [AssignorModule, SharedModule],
   controllers: [PayableController],
-  providers: [PayableService, PrismaService],
+  providers: [PayableService],
 })
 export class PayableModule {}
