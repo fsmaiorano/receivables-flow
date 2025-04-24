@@ -7,11 +7,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './local.strategy';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
+import { SharedModule } from 'src/shared/shared.module';
 
 @Module({
   providers: [AuthService, LocalStrategy, JwtStrategy],
   imports: [
     UserModule,
+    SharedModule,
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,

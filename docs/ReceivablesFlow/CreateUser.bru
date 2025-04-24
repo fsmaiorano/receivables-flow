@@ -5,7 +5,17 @@ meta {
 }
 
 post {
-  url: /user
-  body: none
+  url: http://localhost:3000/user
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "name": "Fábio Maiorano",
+    "email": "fsmaiorano@gmail.com",
+    "username": "fsmaiorano",
+    "password": "123456",
+    "confirmPassword": "123456"
+  }
 }

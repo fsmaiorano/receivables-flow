@@ -13,9 +13,11 @@ export class UserService {
         OR: [{ username: request.username }, { email: request.email }],
       },
     });
+
     if (user) {
       throw new Error('Username already exists');
     }
+
     return this.prismaService.user.create({
       data: {
         username: request.username,

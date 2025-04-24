@@ -1,0 +1,18 @@
+meta {
+  name: Authentication
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/auth/signIn
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "username": "fsmaiorano",
+    "password": "123456"
+  }
+}
