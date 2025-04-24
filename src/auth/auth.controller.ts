@@ -5,12 +5,12 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('auth/login')
+  @Post('login')
   async login(@Body() req) {
     return this.authService.login(req.user);
   }
 
-  @Post('auth/logout')
+  @Post('logout')
   async logout(@Body() req) {
     return req.logout();
   }
