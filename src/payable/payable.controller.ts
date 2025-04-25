@@ -12,6 +12,8 @@ import { CreatePayableRequest } from './dtos/create-payable.request';
 import { CreatePayableResponse } from './dtos/create-payable.response';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
+import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
+import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
 
 @ApiTags('Payable')
 @Controller('payable')
@@ -50,5 +52,15 @@ export class PayableController {
       }
       throw error;
     }
+  }
+
+  @Post('/integrations/payable/batch')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Create a batch of payables' })
+  async createBatchPayable(
+    @Body() createPayableBatchRequest: CreatePayableBatchRequest,
+  ): Promise<CreatePayableBatchResponse[]> {
+    await this.payableService.createBatchPayable(createPayableBatchRequest);
+    return null;
   }
 }

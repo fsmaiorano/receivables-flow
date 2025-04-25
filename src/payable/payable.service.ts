@@ -5,6 +5,7 @@ import { AssignorService } from '../assignor/assignor.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Payable } from './domain/entities/payable.entity';
+import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 
 @Injectable()
 export class PayableService {
@@ -31,5 +32,11 @@ export class PayableService {
 
   async getById(id: string) {
     return await this.payableRepository.findOne({ where: { id } });
+  }
+
+  async createBatchPayable(
+    createPayableBatchRequest: CreatePayableBatchRequest,
+  ) {
+    console.log('createBatchPayable', createPayableBatchRequest.payables);
   }
 }
