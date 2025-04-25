@@ -5,7 +5,7 @@ import { DatabaseModule } from './database/database.module';
 @Module({
   controllers: [],
   providers: [],
-  exports: [DatabaseModule],
+  exports: [DatabaseModule, ClientsModule],
   imports: [
     DatabaseModule,
     ClientsModule.register([
