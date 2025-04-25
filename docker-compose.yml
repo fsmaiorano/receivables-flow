@@ -27,9 +27,38 @@ services:
         limits:
           cpus: '0.50'
           memory: 512M
+  queue-service:
+    container_name: receivables-flow-api-rabbitmq
+    image: rabbitmq:3-management
+    healthcheck:
+      test: [ "CMD-SHELL", "rabbitmqctl node_health_check" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    command: [ "bash", "-c", "chmod 400 /var/lib/rabbitmq/.erlang.cookie; rabbitmq-server" ]
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - app-network
 
 volumes:
   sqlite_data:
+    driver: local
+  rabbitmq_data:
     driver: local
 
 networks:
