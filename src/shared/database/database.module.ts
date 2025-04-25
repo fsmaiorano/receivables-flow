@@ -13,13 +13,16 @@ import 'sqlite3';
         const dbUrl = configService.get<string>('DATABASE_URL');
         // Remove file: prefix if it exists
         const database = dbUrl.startsWith('file:') ? dbUrl.substring(5) : dbUrl;
+        const isProd = configService.get<string>('NODE_ENV') === 'production';
 
         return {
           type: 'sqlite',
           database,
-          entities: [join(__dirname, '../..', '**', '*.entity.{ts,js}')],
-          synchronize: configService.get<string>('NODE_ENV') !== 'production',
-          logging: configService.get<string>('NODE_ENV') !== 'production',
+          entities: [join(__dirname, '../../**', '*.entity.{ts,js}')],
+          migrations: [join(__dirname, 'migrations', '*.{ts,js}')],
+          synchronize: false,
+          logging: !isProd,
+          migrationsRun: false,
         };
       },
     }),
