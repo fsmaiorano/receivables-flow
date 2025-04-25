@@ -39,3 +39,4 @@ data/dev.db
 data/dev.db-journal
 data/prod.db
 data/prod.db-journal
+seed/output/*

@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as dotenv from 'dotenv';
 import { randomUUID } from 'crypto';
 import * as fs from 'fs';
+import { faker } from '@faker-js/faker';
 
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}` });
@@ -13,28 +14,28 @@ const database = dbUrl?.startsWith('file:') ? dbUrl.substring(5) : dbUrl;
 const sampleAssignors = [
   {
     id: randomUUID(),
-    document: '12345678901',
-    email: 'company1@example.com',
-    phone: '11999998888',
-    name: 'Company One Ltd',
+    document: faker.string.numeric(11),
+    email: faker.internet.email(),
+    phone: faker.phone.number(),
+    name: faker.company.name(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
     id: randomUUID(),
-    document: '98765432109',
-    email: 'company2@example.com',
-    phone: '11888889999',
-    name: 'Company Two Inc',
+    document: faker.string.numeric(11),
+    email: faker.internet.email(),
+    phone: faker.phone.number(),
+    name: faker.company.name(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
     id: randomUUID(),
-    document: '56789012345',
-    email: 'company3@example.com',
-    phone: '11777776666',
-    name: 'Company Three Corp',
+    document: faker.string.numeric(11),
+    email: faker.internet.email(),
+    phone: faker.phone.number(),
+    name: faker.company.name(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
