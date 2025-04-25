@@ -6,14 +6,18 @@ import {
   NotFoundException,
   Body,
   UseGuards,
+  BadRequestException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PayableService } from './payable.service';
 import { CreatePayableRequest } from './dtos/create-payable.request';
 import { CreatePayableResponse } from './dtos/create-payable.response';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Payable')
 @Controller('payable')
@@ -56,11 +60,49 @@ export class PayableController {
 
   @Post('/integrations/payable/batch')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Create a batch of payables' })
+  @ApiOperation({ summary: 'Create a batch of payables from JSON' })
   async createBatchPayable(
     @Body() createPayableBatchRequest: CreatePayableBatchRequest,
   ): Promise<CreatePayableBatchResponse[]> {
-    await this.payableService.createBatchPayable(createPayableBatchRequest);
-    return null;
+    const payables = await this.payableService.createBatchPayable(
+      createPayableBatchRequest,
+    );
+    return payables;
+  }
+
+  @Post('/integrations/payable/batch/csv')
+  @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary: 'Create a batch of payables from CSV file',
+    description:
+      'Upload a CSV file with payable data to create multiple payables at once',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'CSV file containing payable data',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async createBatchPayableFromCsv(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<CreatePayableBatchResponse[]> {
+    if (!file) {
+      throw new BadRequestException('CSV file is required');
+    }
+
+    // Parse CSV to payable objects
+    const payables = await this.payableService.createBatchPayableFromCsv(
+      file.buffer,
+    );
+    return payables;
   }
 }
