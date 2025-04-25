@@ -2,17 +2,14 @@ import { DataSource } from 'typeorm';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 import { randomUUID } from 'crypto';
+import * as fs from 'fs';
 
-// Load environment variables
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}` });
 
-// Get database URL from environment
 const dbUrl = process.env.DATABASE_URL;
-// Remove file: prefix if it exists
 const database = dbUrl?.startsWith('file:') ? dbUrl.substring(5) : dbUrl;
 
-// Sample data for creating assignors
 const sampleAssignors = [
   {
     id: randomUUID(),
@@ -46,7 +43,6 @@ const sampleAssignors = [
 async function seed() {
   console.log(`Connecting to database at: ${database}`);
 
-  // Create a connection to the database
   const dataSource = new DataSource({
     type: 'sqlite',
     database,
@@ -55,15 +51,12 @@ async function seed() {
   });
 
   try {
-    // Initialize the connection
     await dataSource.initialize();
     console.log('Database connection established successfully');
 
-    // Get all assignors
     let assignors = await dataSource.query('SELECT * FROM assignor');
     console.log(`Found ${assignors.length} existing assignors`);
 
-    // Create assignors if none exist
     if (assignors.length === 0) {
       console.log('No assignors found. Creating sample assignors...');
 
@@ -85,15 +78,12 @@ async function seed() {
 
       console.log(`Created ${sampleAssignors.length} sample assignors`);
 
-      // Get the newly created assignors
       assignors = await dataSource.query('SELECT * FROM assignor');
     }
 
-    // Create payables for each assignor
     const payablesToCreate = [];
 
     for (const assignor of assignors) {
-      // Create 3 payables per assignor
       for (let i = 0; i < 3; i++) {
         const value = (Math.random() * 10000).toFixed(2);
         const emissionDate = new Date();
@@ -103,35 +93,44 @@ async function seed() {
           value,
           emissionDate: emissionDate.toISOString(),
           assignorId: assignor.id,
+          assignorName: assignor.name,
+          assignorDocument: assignor.document,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
       }
     }
 
-    // Insert payables
-    console.log(`Creating ${payablesToCreate.length} payables...`);
+    console.log(`Generated ${payablesToCreate.length} payables in memory`);
 
-    for (const payable of payablesToCreate) {
-      await dataSource.query(
-        `INSERT INTO payable (id, value, emissionDate, assignorId, createdAt, updatedAt) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [
-          payable.id,
-          payable.value,
-          payable.emissionDate,
-          payable.assignorId,
-          payable.createdAt,
-          payable.updatedAt,
-        ],
-      );
+    const outputDir = path.join(__dirname, 'output');
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir);
     }
+
+    const jsonFilePath = path.join(outputDir, 'seed_payables.json');
+    fs.writeFileSync(jsonFilePath, JSON.stringify(payablesToCreate, null, 2));
+    console.log(`Saved payables to JSON file: ${jsonFilePath}`);
+
+    const csvFilePath = path.join(outputDir, 'seed_payables.csv');
+
+    const csvHeader =
+      'id,value,emissionDate,assignorId,assignorName,assignorDocument,createdAt,updatedAt\n';
+
+    const csvRows = payablesToCreate
+      .map(
+        (p) =>
+          `${p.id},${p.value},"${p.emissionDate}","${p.assignorId}","${p.assignorName}","${p.assignorDocument}","${p.createdAt}","${p.updatedAt}"`,
+      )
+      .join('\n');
+
+    fs.writeFileSync(csvFilePath, csvHeader + csvRows);
+    console.log(`Saved payables to CSV file: ${csvFilePath}`);
 
     console.log('Seed completed successfully!');
   } catch (error) {
     console.error('Error during seeding:', error);
   } finally {
-    // Close the connection
     if (dataSource.isInitialized) {
       await dataSource.destroy();
       console.log('Database connection closed');
@@ -139,7 +138,6 @@ async function seed() {
   }
 }
 
-// Run the seed function
 seed().catch((error) => {
   console.error('Unhandled error during seeding:', error);
   process.exit(1);
