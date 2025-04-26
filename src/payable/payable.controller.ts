@@ -13,13 +13,20 @@ import {
 import { PayableService } from './payable.service';
 import { CreatePayableRequest } from './dtos/create-payable.request';
 import { CreatePayableResponse } from './dtos/create-payable.response';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiConsumes,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Payable')
+@ApiBearerAuth('access-token')
 @Controller('payable')
 export class PayableController {
   constructor(private payableService: PayableService) {}
@@ -99,7 +106,6 @@ export class PayableController {
       throw new BadRequestException('CSV file is required');
     }
 
-    // Parse CSV to payable objects
     const payables = await this.payableService.createBatchPayableFromCsv(
       file.buffer,
     );

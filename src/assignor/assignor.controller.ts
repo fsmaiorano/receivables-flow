@@ -1,8 +1,11 @@
 import { AssignorService } from './assignor.service';
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateAssignorRequest } from './dtos/create-assignor.request';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 
+@ApiTags('Assignor')
+@ApiBearerAuth('access-token')
 @Controller('assignor')
 export class AssignorController {
   constructor(private assignorService: AssignorService) {}

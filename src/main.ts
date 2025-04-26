@@ -18,6 +18,17 @@ async function bootstrap() {
     .setTitle('Receivables Flow')
     .setDescription('The Receivables API description')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Enter your JWT token',
+        in: 'header',
+      },
+      'access-token', // This name is used to reference this security scheme
+    )
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
