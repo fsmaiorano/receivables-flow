@@ -13,7 +13,7 @@ import { DatabaseModule } from './database/database.module';
         name: 'ReceivablesFlow',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: [`amqp://${process.env.RABBITMQ_HOST || 'localhost'}:5672`], // Use environment variable
           queue: 'receivables_queue',
           queueOptions: {
             durable: false,

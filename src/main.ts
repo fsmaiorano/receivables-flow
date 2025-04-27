@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv';
 import { join } from 'path';
+import { RmqOptions, Transport } from '@nestjs/microservices';
 
 const envFile =
   process.env.NODE_ENV === 'production'
@@ -27,12 +28,32 @@ async function bootstrap() {
         description: 'Enter your JWT token',
         in: 'header',
       },
-      'access-token', // This name is used to reference this security scheme
+      'access-token',
     )
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('', app, documentFactory);
+
+  app.connectMicroservice<RmqOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [`amqp://${process.env.RABBITMQ_HOST || 'localhost'}:5672`], // Use environment variable
+      queue: 'receivables-queue',
+      prefetchCount: 1,
+      persistent: true,
+      noAck: false,
+      queueOptions: {
+        durable: true,
+      },
+      socketOptions: {
+        heartbeatIntervalInSeconds: 60,
+        reconnectTimeInSeconds: 5,
+      },
+    },
+  });
+
+  await app.startAllMicroservices();
 
   await app.listen(process.env.PORT ?? 3000);
 

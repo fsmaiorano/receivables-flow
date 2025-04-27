@@ -12,6 +12,7 @@ services:
       - DATABASE_URL=/app/data/production.db
       - JWT_SECRET=${JWT_SECRET:-your-production-jwt-secret}
       - PORT=3000
+      - RABBITMQ_HOST=queue-service
     volumes:
       - sqlite_data:/app/data
     healthcheck:
