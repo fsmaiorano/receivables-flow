@@ -16,7 +16,7 @@ import { DatabaseModule } from './database/database.module';
           urls: [`amqp://${process.env.RABBITMQ_HOST || 'localhost'}:5672`], // Use environment variable
           queue: 'receivables_queue',
           queueOptions: {
-            durable: false,
+            durable: true,
           },
         },
       },

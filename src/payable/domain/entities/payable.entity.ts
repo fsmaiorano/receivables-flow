@@ -14,7 +14,7 @@ export class Payable {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, unique: true })
+  @Column({ type: 'decimal', precision: 10, scale: 2, unique: false })
   value: number;
 
   @Column({ type: 'datetime' })

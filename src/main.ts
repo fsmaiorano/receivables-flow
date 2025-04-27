@@ -38,8 +38,8 @@ async function bootstrap() {
   app.connectMicroservice<RmqOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: [`amqp://${process.env.RABBITMQ_HOST || 'localhost'}:5672`], // Use environment variable
-      queue: 'receivables-queue',
+      urls: [`amqp://${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
+      queue: 'receivables_queue',
       prefetchCount: 1,
       persistent: true,
       noAck: false,

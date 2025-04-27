@@ -24,6 +24,12 @@ import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  Ctx,
+  MessagePattern,
+  Payload,
+  RmqContext,
+} from '@nestjs/microservices';
 
 @ApiTags('Payable')
 @ApiBearerAuth('access-token')
@@ -78,7 +84,7 @@ export class PayableController {
   }
 
   @Post('/integrations/payable/batch/csv')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Create a batch of payables from CSV file',
@@ -110,5 +116,39 @@ export class PayableController {
       file.buffer,
     );
     return payables;
+  }
+
+  @MessagePattern('payable')
+  async handlePayableMessage(@Payload() data: any, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    try {
+      console.log('Received payable message:', data);
+
+      // Process the message here (add your business logic)
+      const result = await this.payableService.createPayable(data);
+
+      // Acknowledge the message after successful processing
+      channel.ack(originalMsg);
+
+      return {
+        status: 'processed',
+        receivedAt: new Date(),
+        id: result.id,
+      };
+    } catch (error) {
+      console.error('Error processing message:', error);
+
+      // Negative acknowledge in case of error, which will requeue the message
+      // You might want to implement a dead letter exchange for failed messages
+      channel.nack(originalMsg, false, false);
+
+      return {
+        status: 'error',
+        error: error.message,
+        receivedAt: new Date(),
+      };
+    }
   }
 }

@@ -8,6 +8,7 @@ import { Payable } from './domain/entities/payable.entity';
 import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class PayableService {
@@ -51,45 +52,75 @@ export class PayableService {
     );
 
     const results: CreatePayableBatchResponse[] = [];
+    const batchSize = 10; // Process in smaller batches to avoid overloading RabbitMQ
 
-    for (const payableRequest of createPayableBatchRequest.payables) {
-      try {
-        const payable = await this.createPayable(payableRequest);
+    // Process in smaller batches
+    for (
+      let i = 0;
+      i < createPayableBatchRequest.payables.length;
+      i += batchSize
+    ) {
+      const batch = createPayableBatchRequest.payables.slice(i, i + batchSize);
 
-        results.push({
-          id: payable.id,
-          value: payable.value,
-          emissionDate: payable.emissionDate,
-          assignorId: payable.assignorId,
-          createdAt: payable.createdAt,
-          updatedAt: payable.updatedAt,
-          status: 'created',
-        });
+      // Process each payable in the batch sequentially
+      for (const payableRequest of batch) {
+        try {
+          // First save the payable to database
+          const payable = await this.createPayable(payableRequest);
 
-        const record = new RmqRecordBuilder(payable)
-          .setOptions({
-            headers: {
-              ['x-version']: '1.0.0',
-            },
-            priority: 3,
-          })
-          .build();
+          // Create a record with proper priority and metadata
+          const record = new RmqRecordBuilder(payableRequest)
+            .setOptions({
+              headers: {
+                ['x-version']: '1.0.0',
+                ['x-correlation-id']: payable.id, // Add correlation ID for tracing
+              },
+              priority: 3,
+            })
+            .build();
 
-        this.client.send('payable', record).subscribe({
-          next: (response) => {
+          // Use firstValueFrom to wait for the message to be delivered
+          try {
+            const response = await firstValueFrom(
+              this.client.send('payable', record),
+            );
+
             console.log('Batch notification sent successfully', response);
-          },
-          error: (error) => {
-            console.error('Error sending batch notification', error);
-          },
-        });
-      } catch (error) {
-        results.push({
-          value: payableRequest.value,
-          assignorId: payableRequest.assignorId,
-          status: 'error',
-          error: error.message,
-        });
+
+            results.push({
+              id: payable.id,
+              value: payable.value,
+              emissionDate: payable.emissionDate,
+              assignorId: payable.assignorId,
+              createdAt: payable.createdAt,
+              updatedAt: payable.updatedAt,
+              status: 'created',
+            });
+          } catch (sendError) {
+            console.error('Error sending batch notification', sendError);
+            results.push({
+              id: payable.id,
+              value: payable.value,
+              emissionDate: payable.emissionDate,
+              assignorId: payable.assignorId,
+              status: 'error',
+              error: `Saved to database but failed to queue: ${sendError.message}`,
+            });
+          }
+        } catch (error) {
+          console.error('Error creating payable:', error);
+          results.push({
+            value: payableRequest.value,
+            assignorId: payableRequest.assignorId,
+            status: 'error',
+            error: error.message,
+          });
+        }
+      }
+
+      // Add a small delay between batches to avoid overloading RabbitMQ
+      if (i + batchSize < createPayableBatchRequest.payables.length) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
 
