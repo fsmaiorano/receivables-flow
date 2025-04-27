@@ -62,24 +62,20 @@ export class PayableService {
     ) {
       const batch = createPayableBatchRequest.payables.slice(i, i + batchSize);
 
-      // Process each payable in the batch sequentially
       for (const payableRequest of batch) {
         try {
-          // First save the payable to database
           const payable = await this.createPayable(payableRequest);
 
-          // Create a record with proper priority and metadata
           const record = new RmqRecordBuilder(payableRequest)
             .setOptions({
               headers: {
                 ['x-version']: '1.0.0',
-                ['x-correlation-id']: payable.id, // Add correlation ID for tracing
+                ['x-correlation-id']: payable.id,
               },
               priority: 3,
             })
             .build();
 
-          // Use firstValueFrom to wait for the message to be delivered
           try {
             const response = await firstValueFrom(
               this.client.send('payable', record),

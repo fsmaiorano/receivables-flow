@@ -7,7 +7,6 @@ import { AssignorService } from '../assignor/assignor.service';
 
 describe('PayableService', () => {
   let service: PayableService;
-  let repository: Repository<Payable>;
 
   const mockRepository = {
     findOne: jest.fn(),
