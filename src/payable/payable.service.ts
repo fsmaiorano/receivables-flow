@@ -52,9 +52,8 @@ export class PayableService {
     );
 
     const results: CreatePayableBatchResponse[] = [];
-    const batchSize = 10; // Process in smaller batches to avoid overloading RabbitMQ
+    const batchSize = 10;
 
-    // Process in smaller batches
     for (
       let i = 0;
       i < createPayableBatchRequest.payables.length;

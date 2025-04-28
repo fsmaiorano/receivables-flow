@@ -125,11 +125,8 @@ export class PayableController {
 
     try {
       console.log('Received payable message:', data);
-
-      // Process the message here (add your business logic)
       const result = await this.payableService.createPayable(data);
 
-      // Acknowledge the message after successful processing
       channel.ack(originalMsg);
 
       return {
@@ -139,11 +136,7 @@ export class PayableController {
       };
     } catch (error) {
       console.error('Error processing message:', error);
-
-      // Negative acknowledge in case of error, which will requeue the message
-      // You might want to implement a dead letter exchange for failed messages
       channel.nack(originalMsg, false, false);
-
       return {
         status: 'error',
         error: error.message,
