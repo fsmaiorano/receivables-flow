@@ -9,7 +9,7 @@ import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
 import { firstValueFrom } from 'rxjs';
-import * as crypto from 'crypto';
+import { CorrelationIdService } from '../shared/services/correlation-id.service';
 
 @Injectable()
 export class PayableService {
@@ -18,6 +18,7 @@ export class PayableService {
     @InjectRepository(Payable)
     private readonly payableRepository: Repository<Payable>,
     @Inject('ReceivablesFlow') private client: ClientProxy,
+    private readonly correlationIdService: CorrelationIdService,
   ) {}
 
   async createPayable(createPayableRequest: CreatePayableRequest) {
@@ -54,80 +55,6 @@ export class PayableService {
       throw new NotFoundException(`Payable with id ${id} not found`);
     }
     return payable;
-  }
-
-  async createBatchPayable(
-    createPayableBatchRequest: CreatePayableBatchRequest,
-  ): Promise<CreatePayableBatchResponse[]> {
-    console.log(
-      'Processing batch of',
-      createPayableBatchRequest.payables.length,
-      'payables',
-    );
-
-    const results: CreatePayableBatchResponse[] = [];
-    const batchSize = 10;
-
-    for (
-      let i = 0;
-      i < createPayableBatchRequest.payables.length;
-      i += batchSize
-    ) {
-      const batch = createPayableBatchRequest.payables.slice(i, i + batchSize);
-
-      for (const payableRequest of batch) {
-        try {
-          const correlationId = crypto.randomUUID();
-          const record = new RmqRecordBuilder(payableRequest)
-            .setOptions({
-              headers: {
-                ['x-version']: '1.0.0',
-                ['x-correlation-id']: correlationId,
-              },
-              priority: 3,
-            })
-            .build();
-
-          try {
-            const response = await firstValueFrom(
-              this.client.send('payable', record),
-            );
-
-            console.log('Batch notification sent successfully', response);
-
-            results.push({
-              id: response.id,
-              value: payableRequest.value,
-              emissionDate: payableRequest.emissionDate,
-              assignorId: payableRequest.assignorId,
-              status: 'created',
-            });
-          } catch (sendError) {
-            console.error('Error sending batch notification', sendError);
-            results.push({
-              value: payableRequest.value,
-              assignorId: payableRequest.assignorId,
-              status: 'error',
-              error: `Failed to queue message: ${sendError.message}`,
-            });
-          }
-        } catch (error) {
-          console.error('Error creating payable:', error);
-          results.push({
-            value: payableRequest.value,
-            assignorId: payableRequest.assignorId,
-            status: 'error',
-            error: error.message,
-          });
-        }
-      }
-
-      if (i + batchSize < createPayableBatchRequest.payables.length) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-    }
-
-    return results;
   }
 
   async createBatchPayableFromCsv(
@@ -173,6 +100,97 @@ export class PayableService {
       payableRequests.push(payableRequest);
     }
 
-    return this.createBatchPayable({ payables: payableRequests });
+    const createdPayableBatches = await this.createBatchPayable({
+      payables: payableRequests,
+    });
+
+    return createdPayableBatches;
+  }
+
+  async createBatchPayable(
+    createPayableBatchRequest: CreatePayableBatchRequest,
+  ): Promise<CreatePayableBatchResponse[]> {
+    console.log(
+      'Processing batch of',
+      createPayableBatchRequest.payables.length,
+      'payables',
+    );
+
+    const results: CreatePayableBatchResponse[] = [];
+    const batchSize = 10;
+
+    for (
+      let i = 0;
+      i < createPayableBatchRequest.payables.length;
+      i += batchSize
+    ) {
+      const batch = createPayableBatchRequest.payables.slice(i, i + batchSize);
+
+      try {
+        await this.sendToQueue(batch);
+      } catch (sendError) {
+        console.error('Error sending batch notification:', {
+          error: sendError.message,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Send a batch of payable requests to the RabbitMQ queue
+   * @param payableBatchRequest Array of payable requests to send
+   * @returns Response from the message broker
+   */
+  private async sendToQueue(
+    payableBatchRequest: CreatePayableRequest[],
+  ): Promise<any> {
+    const correlationId = this.correlationIdService.getCorrelationId();
+    const messageId = crypto.randomUUID();
+
+    const record = new RmqRecordBuilder(payableBatchRequest)
+      .setOptions({
+        headers: {
+          ['x-version']: '1.0.0',
+          ['x-correlation-id']: correlationId,
+          ['x-message-id']: messageId,
+        },
+        priority: 3,
+        messageId: messageId,
+      })
+      .build();
+
+    try {
+      console.log(
+        `Sending batch of ${payableBatchRequest.length} items with correlation ID: ${correlationId}`,
+      );
+      const response = await firstValueFrom(
+        this.client.send('payable', record),
+      );
+      console.log('Batch notification sent successfully', {
+        correlationId,
+        messageId,
+        response,
+      });
+      return {
+        ...response,
+        receivedAt: new Date(),
+        correlationId,
+        messageId,
+      };
+    } catch (error) {
+      console.error('Error sending batch notification:', {
+        error: error.message,
+        stack: error.stack,
+        correlationId,
+        timestamp: new Date().toISOString(),
+        batchSize: payableBatchRequest.length,
+        connectionState: this.client?.status ? 'connected' : 'disconnected',
+      });
+      throw new Error(
+        `Failed to send batch notification: ${error.message}. Correlation ID: ${correlationId}`,
+      );
+    }
   }
 }

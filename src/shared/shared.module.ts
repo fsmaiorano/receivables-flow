@@ -2,11 +2,17 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { DatabaseModule } from './database/database.module';
 import { DeduplicationService } from './services/deduplication.service';
+import { CorrelationIdService } from './services/correlation-id.service';
 
 @Module({
   controllers: [],
-  providers: [DeduplicationService],
-  exports: [DatabaseModule, ClientsModule, DeduplicationService],
+  providers: [DeduplicationService, CorrelationIdService],
+  exports: [
+    DatabaseModule,
+    ClientsModule,
+    DeduplicationService,
+    CorrelationIdService,
+  ],
   imports: [
     DatabaseModule,
     ClientsModule.register([
