@@ -63,7 +63,7 @@ async function seed() {
     const payablesToCreate = [];
 
     for (const assignor of assignors) {
-      for (let i = 0; i < Math.floor(Math.random() * 10); i++) {
+      for (let i = 0; i < Math.floor(Math.random() * 1000); i++) {
         const value = (Math.random() * 10000).toFixed(2);
         const emissionDate = new Date();
 
@@ -93,8 +93,8 @@ async function seed() {
 
     const csvFilePath = path.join(outputDir, 'seed_payables.csv');
 
-    // const csvHeader =
-    //   'id,value,emissionDate,assignorId,assignorName,assignorDocument,createdAt,updatedAt\n';
+    const csvHeader =
+      'id,value,emissionDate,assignorId,assignorName,assignorDocument,createdAt,updatedAt\n';
 
     const csvRows = payablesToCreate
       .map(
@@ -103,8 +103,7 @@ async function seed() {
       )
       .join('\n');
 
-    // fs.writeFileSync(csvFilePath, csvHeader + csvRows);
-    fs.writeFileSync(csvFilePath, csvRows);
+    fs.writeFileSync(csvFilePath, csvHeader + csvRows);
 
     console.log(`Saved payables to CSV file: ${csvFilePath}`);
     console.log('Seed completed successfully!');
