@@ -14,6 +14,7 @@ config({ path: join(process.cwd(), envFile) });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
 
   const config = new DocumentBuilder()
     .setTitle('Receivables Flow')
