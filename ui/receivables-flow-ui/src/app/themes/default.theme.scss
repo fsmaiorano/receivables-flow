@@ -1,0 +1,27 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+@include mat.form-field-overrides(());
+@include mat.progress-spinner-overrides(
+  (
+    size: 25px,
+  )
+);
+@include mat.card-overrides(
+  (
+    subtitle-text-color: orange,
+    title-text-size: 1.5rem,
+  )
+);
+@include mat.button-overrides(());
+@include mat.select-overrides(
+  (
+    panel-background-color: #f0f0f0,
+  )
+);
+@include mat.toolbar-overrides(
+  (
+    container-background-color: rgba(255, 166, 0, 0.868),
+    container-text-color: white,
+  )
+);

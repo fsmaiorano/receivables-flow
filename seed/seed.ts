@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { randomUUID } from 'crypto';
 import * as fs from 'fs';
 import { faker } from '@faker-js/faker';
+import { CreateUserRequest } from 'src/user/dtos/create-user.request';
 
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}` });
@@ -24,6 +25,18 @@ async function seed() {
   try {
     await dataSource.initialize();
     console.log('Database connection established successfully');
+
+    const user: CreateUserRequest = {
+      username: 'aprovame',
+      password: '123456',
+      email: faker.internet.email(),
+      name: faker.company.name(),
+    };
+
+    await dataSource.query(
+      `INSERT INTO user (id,username, password, email, name) VALUES (?, ?, ?, ?, ?)`,
+      [randomUUID(), user.username, user.password, user.email, user.name],
+    );
 
     const newAssignors = [];
     for (let i = 0; i < 3; i++) {
