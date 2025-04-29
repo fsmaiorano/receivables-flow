@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePayableRequest } from './dtos/create-payable.request';
 import { PayableMapper } from './infrastructure/mappers/payable.mapper';
 import { AssignorService } from '../assignor/assignor.service';
@@ -17,7 +17,8 @@ export class PayableService {
     private readonly assignorService: AssignorService,
     @InjectRepository(Payable)
     private readonly payableRepository: Repository<Payable>,
-    @Inject('ReceivablesFlow') private client: ClientProxy,
+    // @Inject('ReceivablesFlow') private client: ClientProxy,
+    private client: ClientProxy,
     private readonly correlationIdService: CorrelationIdService,
   ) {}
 
