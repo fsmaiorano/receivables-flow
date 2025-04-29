@@ -11,36 +11,6 @@ dotenv.config({ path: `.env.${env}` });
 const dbUrl = process.env.DATABASE_URL;
 const database = dbUrl?.startsWith('file:') ? dbUrl.substring(5) : dbUrl;
 
-const sampleAssignors = [
-  {
-    id: randomUUID(),
-    document: faker.string.numeric(11),
-    email: faker.internet.email(),
-    phone: faker.phone.number(),
-    name: faker.company.name(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: randomUUID(),
-    document: faker.string.numeric(11),
-    email: faker.internet.email(),
-    phone: faker.phone.number(),
-    name: faker.company.name(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: randomUUID(),
-    document: faker.string.numeric(11),
-    email: faker.internet.email(),
-    phone: faker.phone.number(),
-    name: faker.company.name(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
 async function seed() {
   console.log(`Connecting to database at: ${database}`);
 
@@ -55,37 +25,45 @@ async function seed() {
     await dataSource.initialize();
     console.log('Database connection established successfully');
 
-    let assignors = await dataSource.query('SELECT * FROM assignor');
-    console.log(`Found ${assignors.length} existing assignors`);
-
-    if (assignors.length === 0) {
-      console.log('No assignors found. Creating sample assignors...');
-
-      for (const assignor of sampleAssignors) {
-        await dataSource.query(
-          `INSERT INTO assignor (id, document, email, phone, name, createdAt, updatedAt) 
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [
-            assignor.id,
-            assignor.document,
-            assignor.email,
-            assignor.phone,
-            assignor.name,
-            assignor.createdAt,
-            assignor.updatedAt,
-          ],
-        );
-      }
-
-      console.log(`Created ${sampleAssignors.length} sample assignors`);
-
-      assignors = await dataSource.query('SELECT * FROM assignor');
+    const newAssignors = [];
+    for (let i = 0; i < 3; i++) {
+      newAssignors.push({
+        id: randomUUID(),
+        document: faker.string.numeric(11),
+        email: faker.internet.email(),
+        phone: faker.phone.number(),
+        name: faker.company.name(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
     }
+
+    console.log(`Generated ${newAssignors.length} assignors in memory`);
+
+    for (const assignor of newAssignors) {
+      await dataSource.query(
+        `INSERT INTO assignor (id, document, email, phone, name, createdAt, updatedAt) 
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          assignor.id,
+          assignor.document,
+          assignor.email,
+          assignor.phone,
+          assignor.name,
+          assignor.createdAt,
+          assignor.updatedAt,
+        ],
+      );
+    }
+
+    console.log(`Created ${newAssignors.length} sample assignors`);
+
+    const assignors = await dataSource.query('SELECT * FROM assignor');
 
     const payablesToCreate = [];
 
     for (const assignor of assignors) {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < Math.floor(Math.random() * 10); i++) {
         const value = (Math.random() * 10000).toFixed(2);
         const emissionDate = new Date();
 
@@ -115,8 +93,8 @@ async function seed() {
 
     const csvFilePath = path.join(outputDir, 'seed_payables.csv');
 
-    const csvHeader =
-      'id,value,emissionDate,assignorId,assignorName,assignorDocument,createdAt,updatedAt\n';
+    // const csvHeader =
+    //   'id,value,emissionDate,assignorId,assignorName,assignorDocument,createdAt,updatedAt\n';
 
     const csvRows = payablesToCreate
       .map(
@@ -125,9 +103,10 @@ async function seed() {
       )
       .join('\n');
 
-    fs.writeFileSync(csvFilePath, csvHeader + csvRows);
-    console.log(`Saved payables to CSV file: ${csvFilePath}`);
+    // fs.writeFileSync(csvFilePath, csvHeader + csvRows);
+    fs.writeFileSync(csvFilePath, csvRows);
 
+    console.log(`Saved payables to CSV file: ${csvFilePath}`);
     console.log('Seed completed successfully!');
   } catch (error) {
     console.error('Error during seeding:', error);

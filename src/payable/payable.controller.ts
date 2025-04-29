@@ -30,12 +30,16 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
+import { DeduplicationService } from '../shared/services/deduplication.service';
 
 @ApiTags('Payable')
 @ApiBearerAuth('access-token')
 @Controller('payable')
 export class PayableController {
-  constructor(private payableService: PayableService) {}
+  constructor(
+    private payableService: PayableService,
+    private deduplicationService: DeduplicationService,
+  ) {}
 
   @Post('/integrations/payable')
   @UseGuards(JwtAuthGuard)
@@ -123,9 +127,41 @@ export class PayableController {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
 
+    // Extract message ID or correlation ID for deduplication
+    // First try to get from RabbitMQ message properties
+    const properties = originalMsg.properties || {};
+    const headers = properties.headers || {};
+
+    // Try to extract a unique identifier from various possible sources
+    const messageId =
+      properties.messageId ||
+      headers['x-correlation-id'] ||
+      headers['x-message-id'] ||
+      (data && data.id) ||
+      // Fallback: create deterministic ID from message content
+      `payable-${JSON.stringify(data)}`;
+
     try {
+      // Check if this message has been processed before
+      if (this.deduplicationService.isProcessed(messageId)) {
+        console.log(
+          `Duplicate message detected with ID: ${messageId}. Skipping processing.`,
+        );
+        // Acknowledge the message but don't process it again
+        channel.ack(originalMsg);
+        return {
+          status: 'skipped',
+          message: 'Duplicate message detected and skipped',
+          receivedAt: new Date(),
+          messageId: messageId,
+        };
+      }
+
       console.log('Received payable message:', data);
       const result = await this.payableService.createPayable(data);
+
+      // Mark message as processed to prevent future duplicates
+      this.deduplicationService.markAsProcessed(messageId);
 
       channel.ack(originalMsg);
 
@@ -133,14 +169,19 @@ export class PayableController {
         status: 'processed',
         receivedAt: new Date(),
         id: result.id,
+        messageId: messageId,
       };
     } catch (error) {
       console.error('Error processing message:', error);
+
+      // Only reject the message if it's not a duplicate
       channel.nack(originalMsg, false, false);
+
       return {
         status: 'error',
         error: error.message,
         receivedAt: new Date(),
+        messageId: messageId,
       };
     }
   }

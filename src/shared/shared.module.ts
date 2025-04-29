@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { DatabaseModule } from './database/database.module';
+import { DeduplicationService } from './services/deduplication.service';
 
 @Module({
   controllers: [],
-  providers: [],
-  exports: [DatabaseModule, ClientsModule],
+  providers: [DeduplicationService],
+  exports: [DatabaseModule, ClientsModule, DeduplicationService],
   imports: [
     DatabaseModule,
     ClientsModule.register([

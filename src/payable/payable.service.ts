@@ -9,6 +9,7 @@ import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
 import { firstValueFrom } from 'rxjs';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class PayableService {
@@ -20,6 +21,19 @@ export class PayableService {
   ) {}
 
   async createPayable(createPayableRequest: CreatePayableRequest) {
+    const existingPayable = await this.payableRepository.findOne({
+      where: {
+        value: createPayableRequest.value,
+        emissionDate: createPayableRequest.emissionDate,
+        assignorId: createPayableRequest.assignorId,
+      },
+    });
+
+    if (!!existingPayable) {
+      console.log('Duplicate payable detected, fetching existing record');
+      return existingPayable;
+    }
+
     const assignor = await this.assignorService.verifyExists({
       assignorId: createPayableRequest.assignorId,
     });
@@ -63,13 +77,12 @@ export class PayableService {
 
       for (const payableRequest of batch) {
         try {
-          const payable = await this.createPayable(payableRequest);
-
+          const correlationId = crypto.randomUUID();
           const record = new RmqRecordBuilder(payableRequest)
             .setOptions({
               headers: {
                 ['x-version']: '1.0.0',
-                ['x-correlation-id']: payable.id,
+                ['x-correlation-id']: correlationId,
               },
               priority: 3,
             })
@@ -83,23 +96,19 @@ export class PayableService {
             console.log('Batch notification sent successfully', response);
 
             results.push({
-              id: payable.id,
-              value: payable.value,
-              emissionDate: payable.emissionDate,
-              assignorId: payable.assignorId,
-              createdAt: payable.createdAt,
-              updatedAt: payable.updatedAt,
+              id: response.id,
+              value: payableRequest.value,
+              emissionDate: payableRequest.emissionDate,
+              assignorId: payableRequest.assignorId,
               status: 'created',
             });
           } catch (sendError) {
             console.error('Error sending batch notification', sendError);
             results.push({
-              id: payable.id,
-              value: payable.value,
-              emissionDate: payable.emissionDate,
-              assignorId: payable.assignorId,
+              value: payableRequest.value,
+              assignorId: payableRequest.assignorId,
               status: 'error',
-              error: `Saved to database but failed to queue: ${sendError.message}`,
+              error: `Failed to queue message: ${sendError.message}`,
             });
           }
         } catch (error) {
@@ -113,7 +122,6 @@ export class PayableService {
         }
       }
 
-      // Add a small delay between batches to avoid overloading RabbitMQ
       if (i + batchSize < createPayableBatchRequest.payables.length) {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
