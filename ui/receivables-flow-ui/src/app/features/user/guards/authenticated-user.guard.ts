@@ -7,7 +7,7 @@ export const authenticatedUserGuard: CanActivateFn = () => {
   const router = inject(Router);
   const store = storeService.getStore();
 
-  if (store.token === '') {
+  if (!store || !store.token || store.token === '') {
     console.log('authenticatedUserGuard: redirecting to /');
     router.navigate(['/']);
     return false;
