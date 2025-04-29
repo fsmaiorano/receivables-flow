@@ -7,6 +7,14 @@ import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
 import {
   provideHttpClient,
   withInterceptorsFromDi,
@@ -23,6 +31,14 @@ import {
     ReactiveFormsModule,
     MatCardModule,
     MatProgressSpinnerModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatDividerModule,
+    MatGridListModule,
+    MatExpansionModule,
+    MatTabsModule,
+    MatRadioModule,
+    MatSelectModule,
   ],
   exports: [
     CommonModule,
@@ -33,6 +49,14 @@ import {
     ReactiveFormsModule,
     MatCardModule,
     MatProgressSpinnerModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatDividerModule,
+    MatGridListModule,
+    MatExpansionModule,
+    MatTabsModule,
+    MatRadioModule,
+    MatSelectModule,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })
