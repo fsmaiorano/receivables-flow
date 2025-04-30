@@ -15,6 +15,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDialogModule } from '@angular/material/dialog';
 import {
   provideHttpClient,
   withInterceptorsFromDi,
@@ -39,6 +40,7 @@ import {
     MatTabsModule,
     MatRadioModule,
     MatSelectModule,
+    MatDialogModule,
   ],
   exports: [
     CommonModule,
@@ -57,6 +59,7 @@ import {
     MatTabsModule,
     MatRadioModule,
     MatSelectModule,
+    MatDialogModule,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })

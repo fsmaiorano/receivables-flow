@@ -1,0 +1,13 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+
+  > .add-button {
+    position: absolute;
+    z-index: 1000;
+    width: 70px;
+    height: 70px;
+    right: 50px;
+    bottom: 50px;
+  }
+}
