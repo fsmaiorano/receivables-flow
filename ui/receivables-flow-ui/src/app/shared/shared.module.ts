@@ -17,6 +17,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { RouterModule } from '@angular/router';
 import {
   provideHttpClient,
   withInterceptorsFromDi,
@@ -43,6 +45,8 @@ import {
     MatSelectModule,
     MatDialogModule,
     MatSidenavModule,
+    MatListModule,
+    RouterModule,
   ],
   exports: [
     CommonModule,
@@ -63,6 +67,8 @@ import {
     MatSelectModule,
     MatDialogModule,
     MatSidenavModule,
+    MatListModule,
+    RouterModule,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })
