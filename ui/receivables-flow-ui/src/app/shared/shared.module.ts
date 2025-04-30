@@ -19,6 +19,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import {
   provideHttpClient,
   withInterceptorsFromDi,
@@ -47,6 +49,8 @@ import {
     MatSidenavModule,
     MatListModule,
     RouterModule,
+    MatTableModule,
+    MatPaginatorModule,
   ],
   exports: [
     CommonModule,
@@ -69,6 +73,8 @@ import {
     MatSidenavModule,
     MatListModule,
     RouterModule,
+    MatTableModule,
+    MatPaginatorModule,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })
