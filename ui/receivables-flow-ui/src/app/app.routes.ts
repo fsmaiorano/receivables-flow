@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { AuthComponent } from './features/user/components/auth/auth.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { authenticatedUserGuard } from './features/user/guards/authenticated-user.guard';
+import { AssignorsComponent } from './features/assignors/assignors.component';
+import { ReceivablesComponent } from './features/receivables/receivables.component';
 
 export const routes: Routes = [
   {
@@ -11,6 +13,16 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
+    canActivate: [authenticatedUserGuard],
+  },
+  {
+    path: 'assignors',
+    component: AssignorsComponent,
+    canActivate: [authenticatedUserGuard],
+  },
+  {
+    path: 'receivables',
+    component: ReceivablesComponent,
     canActivate: [authenticatedUserGuard],
   },
   {

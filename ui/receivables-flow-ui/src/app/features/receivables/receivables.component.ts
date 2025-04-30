@@ -1,7 +1,7 @@
 import { Component, Inject, Optional } from '@angular/core';
-import { SharedModule } from '../../../../shared/shared.module';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-receivables',
