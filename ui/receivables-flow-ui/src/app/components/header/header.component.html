@@ -1,5 +1,10 @@
 <mat-toolbar class="container">
-  <h1>Receivables</h1>
+  <div class="left-section">
+    <button mat-button class="toggle-btn" (click)="toggleSidenav()">
+      Toggle
+    </button>
+    <h1>Receivables</h1>
+  </div>
   <button mat-button [matMenuTriggerFor]="beforeMenu">
     <mat-icon aria-hidden="false" aria-label="Profile" fontIcon="face" />
   </button>

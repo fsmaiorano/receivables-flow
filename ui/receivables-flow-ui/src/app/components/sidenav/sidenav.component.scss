@@ -1,0 +1,49 @@
+.sidenav-container {
+  display: flex;
+  height: calc(100vh - 50px);
+}
+
+.sidenav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  background: rgba(255, 0, 0, 0.5);
+  border-radius: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  height: 100%;
+}
+
+.sidenav-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.content-header {
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-title {
+  margin: 0;
+  font-weight: 500;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  overflow: auto;
+}
+
+.content-container ::ng-deep > * {
+  width: 100%;
+  height: 100%;
+}
