@@ -1,6 +1,8 @@
 .sidenav-container {
   display: flex;
   height: calc(100vh - 50px);
+  background-color: transparent;
+  position: relative;
 }
 
 .sidenav {
@@ -12,6 +14,8 @@
   border-radius: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   height: 100%;
+  z-index: 1000;
+  position: absolute;
 }
 
 .sidenav-content {
@@ -19,6 +23,12 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
+  background-color: inherit;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
 }
 
 .content-header {

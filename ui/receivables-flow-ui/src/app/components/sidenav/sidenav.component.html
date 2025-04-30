@@ -1,5 +1,11 @@
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #sidenav mode="side" opened class="sidenav">
+<mat-sidenav-container class="sidenav-container" hasBackdrop="false">
+  <mat-sidenav
+    #sidenav
+    mode="over"
+    [disableClose]="true"
+    class="sidenav"
+    fixedInViewport="true"
+  >
     {{ options.value.fixed ? 'Fixed' : 'Non-fixed' }} Sidenav
   </mat-sidenav>
 
