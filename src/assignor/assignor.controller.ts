@@ -45,4 +45,10 @@ export class AssignorController {
   getAssignorById(@Param('id') id: string) {
     return this.assignorService.getAssignorById(id);
   }
+
+  @Get('/integrations/assignor')
+  @UseGuards(JwtAuthGuard)
+  getAllAssignors() {
+    return this.assignorService.getAllAssignors();
+  }
 }

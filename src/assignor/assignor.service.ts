@@ -103,4 +103,14 @@ export class AssignorService {
 
     return Result.success<void>(undefined, HttpStatusCode.Ok);
   }
+
+  async getAllAssignors(): Promise<Result<CreateAssignorResponse[]>> {
+    const assignors = await this.assignorRepository.find();
+    return Result.success<CreateAssignorResponse[]>(
+      assignors.map((assignor) => ({
+        id: assignor.id,
+      })),
+      HttpStatusCode.Ok,
+    );
+  }
 }
