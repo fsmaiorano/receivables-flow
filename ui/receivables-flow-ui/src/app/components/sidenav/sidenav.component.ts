@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs';
 export class SidenavComponent implements OnInit, OnDestroy {
   private _formBuilder = inject(FormBuilder);
   private sidenavSubscription: Subscription;
-  private readonly MOBILE_BREAKPOINT = 768; // Mobile breakpoint in pixels
+  private readonly SMALL_SCREEN_BREAKPOINT = 1024;
 
   @ViewChild('sidenav') sidenav!: MatSidenav;
 
@@ -56,11 +56,16 @@ export class SidenavComponent implements OnInit, OnDestroy {
 
   private checkScreenSize() {
     this.ngZone.run(() => {
-      if (window.innerWidth < this.MOBILE_BREAKPOINT) {
-        // Mobile view - close sidenav if it's open
-        if (this.sidenav && this.sidenav.opened) {
-          this.sidenav.close();
-        }
+      if (window.innerWidth < this.SMALL_SCREEN_BREAKPOINT) {
+        this.sidenav.mode = 'over';
+        this.sidenav.disableClose = true;
+      }
+      if (window.innerWidth >= this.SMALL_SCREEN_BREAKPOINT) {
+        this.sidenav.mode = 'side';
+        this.sidenav.disableClose = false;
+      }
+      if (this.sidenav && this.sidenav.opened) {
+        this.sidenav.close();
       }
     });
   }
