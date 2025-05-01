@@ -6,6 +6,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Result } from 'src/shared/dto/result.generic';
 import { HttpStatusCode } from 'axios';
+import { GetAssignorResponse } from './dtos/get-assignor.response';
+import { PaginatedResponseDto } from 'src/shared/dto/pagination.response';
+import { PaginationRequestDto } from 'src/shared/dto/pagination.request';
 
 export interface VerifyExistsParams {
   assignorId?: string;
@@ -104,13 +107,48 @@ export class AssignorService {
     return Result.success<void>(undefined, HttpStatusCode.Ok);
   }
 
-  async getAllAssignors(): Promise<Result<CreateAssignorResponse[]>> {
-    const assignors = await this.assignorRepository.find();
-    return Result.success<CreateAssignorResponse[]>(
-      assignors.map((assignor) => ({
-        id: assignor.id,
-      })),
-      HttpStatusCode.Ok,
-    );
+  async getAllAssignors(
+    paginationOptions?: PaginationRequestDto,
+  ): Promise<Result<PaginatedResponseDto<GetAssignorResponse>>> {
+    try {
+      const page = paginationOptions?.page ?? 0;
+      const pageSize = paginationOptions?.pageSize ?? 10;
+
+      const totalCount = await this.assignorRepository.count();
+
+      const assignors = await this.assignorRepository.find({
+        skip: page * pageSize,
+        take: pageSize,
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+
+      const assignorResponses: GetAssignorResponse[] = assignors.map(
+        (assignor) => ({
+          id: assignor.id,
+          document: assignor.document,
+          email: assignor.email,
+          phone: assignor.phone,
+          name: assignor.name,
+          createdAt: assignor.createdAt,
+          updatedAt: assignor.updatedAt,
+        }),
+      );
+
+      const paginatedResponse = PaginatedResponseDto.create(
+        assignorResponses,
+        totalCount,
+        page,
+        pageSize,
+      );
+
+      return Result.success(paginatedResponse, HttpStatusCode.Ok);
+    } catch (error) {
+      return Result.failure(
+        error.message || 'Failed to retrieve assignors',
+        HttpStatusCode.InternalServerError,
+      );
+    }
   }
 }
