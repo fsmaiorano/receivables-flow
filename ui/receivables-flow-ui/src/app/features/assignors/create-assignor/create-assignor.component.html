@@ -9,7 +9,7 @@
   <form
     [formGroup]="assignorForm"
     (ngSubmit)="onSubmit()"
-    class="update-assignor-form"
+    class="create-assignor-form"
   >
     <mat-form-field appearance="outline" class="form-field">
       <mat-label>Name</mat-label>
@@ -20,13 +20,8 @@
         placeholder="Enter assignor name"
       />
       <mat-icon matSuffix>person</mat-icon>
-      <mat-error
-        *ngIf="
-          assignorForm.get('name')?.invalid &&
-          (assignorForm.get('name')?.touched || assignorForm.get('name')?.dirty)
-        "
-      >
-        Name is required.
+      <mat-error *ngIf="(f['name'].touched || submitted) && f['name'].errors">
+        {{ getErrorMessage('name') }}
       </mat-error>
     </mat-form-field>
 
@@ -39,14 +34,8 @@
         placeholder="Enter assignor email"
       />
       <mat-icon matSuffix>email</mat-icon>
-      <mat-error
-        *ngIf="
-          assignorForm.get('email')?.invalid &&
-          (assignorForm.get('email')?.touched ||
-            assignorForm.get('email')?.dirty)
-        "
-      >
-        Email is required.
+      <mat-error *ngIf="(f['email'].touched || submitted) && f['email'].errors">
+        {{ getErrorMessage('email') }}
       </mat-error>
     </mat-form-field>
 
@@ -59,14 +48,8 @@
         placeholder="Enter assignor phone"
       />
       <mat-icon matSuffix>phone</mat-icon>
-      <mat-error
-        *ngIf="
-          assignorForm.get('phone')?.invalid &&
-          (assignorForm.get('phone')?.touched ||
-            assignorForm.get('phone')?.dirty)
-        "
-      >
-        Phone is required.
+      <mat-error *ngIf="(f['phone'].touched || submitted) && f['phone'].errors">
+        {{ getErrorMessage('phone') }}
       </mat-error>
     </mat-form-field>
 
@@ -79,14 +62,8 @@
         placeholder="Enter assignor document"
       />
       <mat-icon matSuffix>description</mat-icon>
-      <mat-error
-        *ngIf="
-          assignorForm.get('document')?.invalid &&
-          (assignorForm.get('document')?.touched ||
-            assignorForm.get('document')?.dirty)
-        "
-      >
-        Document is required.
+      <mat-error *ngIf="(f['document'].touched || submitted) && f['document'].errors">
+        {{ getErrorMessage('document') }}
       </mat-error>
     </mat-form-field>
 
@@ -104,11 +81,11 @@
         mat-raised-button
         color="primary"
         type="submit"
-        [disabled]="assignorForm.invalid || loading"
+        [disabled]="loading"
         class="save-btn"
       >
         <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
-        <span *ngIf="!loading">Save Changes</span>
+        <span *ngIf="!loading">Create Assignor</span>
       </button>
     </div>
   </form>
