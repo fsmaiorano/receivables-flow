@@ -20,13 +20,13 @@ import { CreateAssignorRequest } from './dtos/create-assignor.request';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { PaginationRequestDto } from 'src/shared/dto/pagination.request';
 
-@ApiTags('Assignor')
+@ApiTags('Integrations')
 @ApiBearerAuth('access-token')
-@Controller('assignor')
+@Controller('Integrations')
 export class AssignorController {
   constructor(private assignorService: AssignorService) {}
 
-  @Post('')
+  @Post()
   @UseGuards(JwtAuthGuard)
   createAssignor(@Body() createAssignorRequest: CreateAssignorRequest) {
     return this.assignorService.createAssignor(createAssignorRequest);
@@ -47,13 +47,13 @@ export class AssignorController {
     return this.assignorService.deleteAssignor(id);
   }
 
-  @Get('/integrations/assignor/:id')
+  @Get('assignor/:id')
   @UseGuards(JwtAuthGuard)
   getAssignorById(@Param('id') id: string) {
     return this.assignorService.getAssignorById(id);
   }
 
-  @Get('/integrations/assignor')
+  @Get('assignor')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get all assignors with pagination support' })
   @ApiQuery({
@@ -73,7 +73,7 @@ export class AssignorController {
     @Query('pageSize') pageSize?: number,
   ) {
     const paginationOptions: PaginationRequestDto = {
-      page: page !== undefined ? Number(page) : 0,
+      page: page !== undefined ? Number(page) : 1,
       pageSize: pageSize !== undefined ? Number(pageSize) : 10,
     };
 

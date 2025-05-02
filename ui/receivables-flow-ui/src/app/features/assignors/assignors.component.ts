@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { SharedModule } from '../../shared/shared.module';
 import { HttpClient } from '@angular/common/http';
+import { AssignorService } from '../core/data/http/assignor/assignor.service';
 
 interface Assignor {
   id: string;
@@ -28,6 +29,7 @@ export class AssignorsComponent implements OnInit {
   constructor(
     private dialog: MatDialog,
     private http: HttpClient,
+    private assignorService: AssignorService,
   ) {}
 
   ngOnInit(): void {
@@ -36,28 +38,38 @@ export class AssignorsComponent implements OnInit {
 
   ngAfterViewInit() {
     this.assignors.paginator = this.paginator;
+    if (this.paginator) {
+      this.paginator.page.subscribe(() => {
+        this.loadAssignors();
+      });
+    }
   }
 
   loadAssignors() {
-    // Get the token from session storage
-    const token = sessionStorage.getItem('token');
+    const pageIndex = this.paginator?.pageIndex ?? 1;
+    const pageSize = this.paginator?.pageSize ?? 10;
 
-    // Add the token to the headers
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
+    this.assignorService.getAssignors(pageIndex, pageSize).subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data) {
+          this.assignors.data = response.data.items;
 
-    // Make the HTTP request
-    // this.http
-    //   .get<any>(`${environment.apiUrl}/assignor`, { headers })
-    //   .subscribe({
-    //     next: (response) => {
-    //       this.assignors.data = response;
-    //     },
-    //     error: (error) => {
-    //       console.error('Error loading assignors', error);
-    //     },
-    //   });
+          if (this.paginator) {
+            this.paginator.length = response.data.meta.totalItems;
+          }
+        } else {
+          console.error('Failed to load assignors:', response.error);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading assignors', error);
+      },
+    });
+  }
+
+  deleteAssignor(arg0: any) {
+    console.log('Delete assignor', arg0);
+    throw new Error('Method not implemented.');
   }
 
   openCreateAssignorDialog() {
@@ -68,26 +80,5 @@ export class AssignorsComponent implements OnInit {
   openEditAssignorDialog(assignor: Assignor) {
     // TODO: Implement dialog for editing assignors
     console.log('Open edit assignor dialog', assignor);
-  }
-
-  deleteAssignor(id: string) {
-    if (confirm('Are you sure you want to delete this assignor?')) {
-      const token = sessionStorage.getItem('token');
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
-
-      // this.http
-      //   .delete(`${environment.apiUrl}/assignor/${id}`, { headers })
-      //   .subscribe({
-      //     next: () => {
-      //       // Refresh the assignors list after deletion
-      //       this.loadAssignors();
-      //     },
-      //     error: (error) => {
-      //       console.error('Error deleting assignor', error);
-      //     },
-      //   });
-    }
   }
 }

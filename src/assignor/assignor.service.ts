@@ -111,13 +111,15 @@ export class AssignorService {
     paginationOptions?: PaginationRequestDto,
   ): Promise<Result<PaginatedResponseDto<GetAssignorResponse>>> {
     try {
-      const page = paginationOptions?.page ?? 0;
+      const page = paginationOptions?.page ?? 1;
       const pageSize = paginationOptions?.pageSize ?? 10;
+
+      const skip = (page - 1) * pageSize;
 
       const totalCount = await this.assignorRepository.count();
 
       const assignors = await this.assignorRepository.find({
-        skip: page * pageSize,
+        skip: skip,
         take: pageSize,
         order: {
           createdAt: 'DESC',

@@ -41,8 +41,12 @@
   <!-- Pagination -->
   <div class="pagination">
     <mat-paginator
-      [pageSizeOptions]="[5, 10, 20]"
-      showFirstLastButtons
+      [length]="0"
+      [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      [showFirstLastButtons]="true"
+      [hidePageSize]="false"
+      aria-label="Select page of assignors"
     ></mat-paginator>
   </div>
 </section>

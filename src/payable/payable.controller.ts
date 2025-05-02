@@ -27,16 +27,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 import { DeduplicationService } from '../shared/services/deduplication.service';
 
-@ApiTags('Payable')
+@ApiTags('Integrations')
 @ApiBearerAuth('access-token')
-@Controller('payable')
+@Controller('Integrations')
 export class PayableController {
   constructor(
     private payableService: PayableService,
     private deduplicationService: DeduplicationService,
   ) {}
 
-  @Post('/integrations/payable')
+  @Post('payable')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create a new payable' })
   async createPayable(
@@ -55,7 +55,7 @@ export class PayableController {
     };
   }
 
-  @Get('/integrations/payable/:id')
+  @Get('payable/:id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get payable by ID' })
   async getPayableById(@Param('id') id: string) {
@@ -70,7 +70,7 @@ export class PayableController {
     }
   }
 
-  @Post('/integrations/payable/batch')
+  @Post('payable/batch')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create a batch of payables from JSON' })
   async createBatchPayable(
@@ -82,7 +82,7 @@ export class PayableController {
     return payables;
   }
 
-  @Post('/integrations/payable/batch/csv')
+  @Post('payable/batch/csv')
   // @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
