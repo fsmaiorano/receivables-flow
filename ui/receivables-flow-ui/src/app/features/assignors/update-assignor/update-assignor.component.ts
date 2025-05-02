@@ -32,7 +32,7 @@ export class UpdateAssignorComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) public data: { assignor: Assignor },
+    @Inject(MAT_DIALOG_DATA) public data: Assignor,
     private dialogRef: MatDialogRef<UpdateAssignorComponent>,
     private assignorService: AssignorService,
     private snackBar: MatSnackBar,
@@ -53,12 +53,12 @@ export class UpdateAssignorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.data?.assignor) {
+    if (this.data) {
       this.assignorForm.patchValue({
-        name: this.data.assignor.name,
-        email: this.data.assignor.email,
-        document: this.data.assignor.document,
-        phone: this.data.assignor.phone,
+        name: this.data.name,
+        email: this.data.email,
+        document: this.data.document,
+        phone: this.data.phone,
       });
     }
   }
@@ -72,15 +72,19 @@ export class UpdateAssignorComponent implements OnInit {
   getErrorMessage(controlName: string): string {
     const control = this.f[controlName];
 
-    if (control.errors?.['required']) {
+    if (!control || !control.errors) {
+      return '';
+    }
+
+    if (control.errors['required']) {
       return `${controlName.charAt(0).toUpperCase() + controlName.slice(1)} is required`;
     }
 
-    if (control.errors?.['email'] || control.errors?.['pattern']) {
+    if (control.errors['email'] || control.errors['pattern']) {
       return 'Please enter a valid email address';
     }
 
-    if (control.errors?.['minlength']) {
+    if (control.errors['minlength']) {
       return `${controlName.charAt(0).toUpperCase() + controlName.slice(1)} must be at least ${control.errors['minlength'].requiredLength} characters`;
     }
 
@@ -96,11 +100,11 @@ export class UpdateAssignorComponent implements OnInit {
       control?.markAsTouched({ onlySelf: true });
     });
 
-    if (this.assignorForm.valid && this.data?.assignor?.id) {
+    if (this.assignorForm.valid && this.data?.id) {
       this.loading = true;
 
       this.assignorService
-        .updateAssignor(this.data.assignor.id, this.assignorForm.value)
+        .updateAssignor(this.data.id, this.assignorForm.value)
         .subscribe({
           next: (response) => {
             if (response.isSuccess) {

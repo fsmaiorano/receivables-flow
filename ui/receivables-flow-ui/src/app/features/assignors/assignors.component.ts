@@ -48,10 +48,10 @@ export class AssignorsComponent implements OnInit {
   }
 
   loadAssignors() {
-    const pageIndex = this.paginator?.pageIndex ?? 1;
+    const pageIndex = this.paginator?.pageIndex ?? 0;
     const pageSize = this.paginator?.pageSize ?? 10;
 
-    this.assignorService.getAssignors(pageIndex, pageSize).subscribe({
+    this.assignorService.getAssignors(pageIndex + 1, pageSize).subscribe({
       next: (response) => {
         if (response.isSuccess && response.data) {
           this.assignors.data = response.data.items;
@@ -69,9 +69,21 @@ export class AssignorsComponent implements OnInit {
     });
   }
 
-  deleteAssignor(arg0: any) {
-    console.log('Delete assignor', arg0);
-    throw new Error('Method not implemented.');
+  deleteAssignor(id: string) {
+    if (confirm('Are you sure you want to delete this assignor?')) {
+      this.assignorService.deleteAssignor(id).subscribe({
+        next: (response) => {
+          if (response.isSuccess) {
+            this.loadAssignors();
+          } else {
+            console.error('Failed to delete assignor:', response.error);
+          }
+        },
+        error: (error) => {
+          console.error('Error deleting assignor', error);
+        },
+      });
+    }
   }
 
   openCreateAssignorDialog() {
@@ -79,10 +91,12 @@ export class AssignorsComponent implements OnInit {
       width: '500px',
       maxWidth: '90vw',
       autoFocus: false,
-      data: null,
     });
+
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
+      if (result) {
+        this.loadAssignors();
+      }
     });
   }
 
@@ -93,8 +107,11 @@ export class AssignorsComponent implements OnInit {
       autoFocus: false,
       data: assignor,
     });
+
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
+      if (result) {
+        this.loadAssignors();
+      }
     });
   }
 }

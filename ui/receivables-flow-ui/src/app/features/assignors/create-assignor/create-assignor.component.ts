@@ -54,15 +54,19 @@ export class CreateAssignorComponent implements OnInit {
   getErrorMessage(controlName: string): string {
     const control = this.f[controlName];
 
-    if (control.errors?.['required']) {
+    if (!control || !control.errors) {
+      return '';
+    }
+
+    if (control.errors['required']) {
       return `${controlName.charAt(0).toUpperCase() + controlName.slice(1)} is required`;
     }
 
-    if (control.errors?.['email'] || control.errors?.['pattern']) {
+    if (control.errors['email'] || control.errors['pattern']) {
       return 'Please enter a valid email address';
     }
 
-    if (control.errors?.['minlength']) {
+    if (control.errors['minlength']) {
       return `${controlName.charAt(0).toUpperCase() + controlName.slice(1)} must be at least ${control.errors['minlength'].requiredLength} characters`;
     }
 

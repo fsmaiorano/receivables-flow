@@ -11,12 +11,11 @@
   margin: 0 auto;
   position: relative;
 
-  // Modal header styling
   &-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
 
     h2 {
       margin: 0;
@@ -39,7 +38,6 @@
     }
   }
 
-  // Form fields container
   &-form {
     display: flex;
     flex-direction: column;
@@ -48,19 +46,9 @@
 
     .form-field {
       width: 100%;
-
-      mat-label {
-        font-weight: 500;
-      }
-
-      input {
-        padding: 0.75rem;
-        border-radius: 6px;
-      }
     }
   }
 
-  // Actions section for buttons
   &-actions {
     display: flex;
     justify-content: flex-end;
@@ -86,8 +74,20 @@
         background-color: var(--color-primary, #1976d2);
         color: white;
 
-        &:hover:not([disabled]) {
+        &:hover {
           background-color: var(--color-primary-dark, #1565c0);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  }
+}
+
+::ng-deep .mat-dialog-container {
+  padding: 0 !important;
+  overflow: hidden;
+  background-color: transparent;
+  box-shadow: none;
 }
 
 @media (max-width: 600px) {

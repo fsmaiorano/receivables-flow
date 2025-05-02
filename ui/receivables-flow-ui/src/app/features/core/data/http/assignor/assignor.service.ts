@@ -76,4 +76,15 @@ export class AssignorService {
       options,
     );
   }
+
+  deleteAssignor(id: string): Observable<Result<AssignorResponse>> {
+    const options = {
+      headers: this.getAuthorizationHeaders(),
+    };
+
+    return this.http.delete<Result<AssignorResponse>>(
+      `http://localhost:3333/integrations/assignor/${id}`,
+      options,
+    );
+  }
 }
