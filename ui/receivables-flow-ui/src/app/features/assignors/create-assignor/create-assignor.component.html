@@ -19,6 +19,7 @@
         required
         placeholder="Enter assignor name"
       />
+      <mat-icon matSuffix>person</mat-icon>
       <mat-error
         *ngIf="
           assignorForm.get('name')?.invalid &&
@@ -89,8 +90,7 @@
       </mat-error>
     </mat-form-field>
 
-    <!-- Action buttons at the bottom -->
-    <div class="update-assignor-actions">
+    <div class="create-assignor-actions">
       <button
         mat-button
         type="button"
