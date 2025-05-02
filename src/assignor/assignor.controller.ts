@@ -41,7 +41,7 @@ export class AssignorController {
     return this.assignorService.updateAssignor(id, createAssignorRequest);
   }
 
-  @Delete(':id')
+  @Delete('assignor/:id')
   @UseGuards(JwtAuthGuard)
   deleteAssignor(@Param('id') id: string) {
     return this.assignorService.deleteAssignor(id);
