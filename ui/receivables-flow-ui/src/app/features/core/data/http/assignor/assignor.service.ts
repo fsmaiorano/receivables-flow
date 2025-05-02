@@ -61,4 +61,19 @@ export class AssignorService {
       options,
     );
   }
+
+  updateAssignor(
+    id: string,
+    assignor: CreateAssignorRequest,
+  ): Observable<Result<AssignorResponse>> {
+    const options = {
+      headers: this.getAuthorizationHeaders(),
+    };
+
+    return this.http.put<Result<AssignorResponse>>(
+      `http://localhost:3333/integrations/assignor/${id}`,
+      assignor,
+      options,
+    );
+  }
 }

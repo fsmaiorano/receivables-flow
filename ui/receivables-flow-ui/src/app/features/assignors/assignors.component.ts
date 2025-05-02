@@ -80,7 +80,7 @@ export class AssignorsComponent implements OnInit {
 
   openEditAssignorDialog(assignor: Assignor) {
     const dialogRef = this.dialog.open(UpdateAssignorComponent, {
-      width: '1200px',
+      width: '500px',
       maxWidth: '90vw',
       autoFocus: false,
       data: assignor,
