@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { SharedModule } from '../../shared/shared.module';
 import { HttpClient } from '@angular/common/http';
 import { AssignorService } from '../core/data/http/assignor/assignor.service';
-import { ReceivablesComponent } from '../receivables/receivables.component';
+import { UpdateAssignorComponent } from './update-assignor/update-assignor.component';
 
 interface Assignor {
   id: string;
@@ -78,11 +78,12 @@ export class AssignorsComponent implements OnInit {
     console.log('Open create assignor dialog');
   }
 
-  openEditAssignorDialog() {
-    const dialogRef = this.dialog.open(ReceivablesComponent, {
+  openEditAssignorDialog(assignor: Assignor) {
+    const dialogRef = this.dialog.open(UpdateAssignorComponent, {
       width: '1200px',
       maxWidth: '90vw',
       autoFocus: false,
+      data: assignor,
     });
     dialogRef.afterClosed().subscribe((result) => {
       console.log(`Dialog result: ${result}`);

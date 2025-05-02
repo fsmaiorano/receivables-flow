@@ -1,0 +1,81 @@
+<section class="update-assignor">
+  <h1>Update Assignor</h1>
+  <form [formGroup]="assignorForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input
+        matInput
+        formControlName="name"
+        required
+        placeholder="Enter assignor name"
+      />
+      <mat-error
+        *ngIf="
+          assignorForm.get('name')?.invalid &&
+          (assignorForm.get('name')?.touched || assignorForm.get('name')?.dirty)
+        "
+      >
+        Name is required.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input
+        matInput
+        formControlName="email"
+        required
+        placeholder="Enter assignor email"
+      />
+      <mat-error
+        *ngIf="
+          assignorForm.get('email')?.invalid ||
+          assignorForm.get('email')?.touched ||
+          assignorForm.get('email')?.dirty
+        "
+      >
+        Email is required.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Phone</mat-label>
+      <input
+        matInput
+        formControlName="phone"
+        required
+        placeholder="Enter assignor phone"
+      />
+      <mat-error
+        *ngIf="
+          assignorForm.get('phone')?.invalid &&
+          (assignorForm.get('phone')?.touched ||
+            assignorForm.get('phone')?.dirty)
+        "
+      >
+        Phone is required.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Document</mat-label>
+      <input
+        matInput
+        formControlName="document"
+        required
+        placeholder="Enter assignor document"
+      />
+      <mat-error
+        *ngIf="
+          assignorForm.get('address')?.invalid &&
+          (assignorForm.get('address')?.touched ||
+            assignorForm.get('address')?.dirty)
+        "
+      >
+        Document is required.
+      </mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Update</button>
+  </form>
+</section>
