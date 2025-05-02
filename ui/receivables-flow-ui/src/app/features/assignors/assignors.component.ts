@@ -6,6 +6,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { HttpClient } from '@angular/common/http';
 import { AssignorService } from '../core/data/http/assignor/assignor.service';
 import { UpdateAssignorComponent } from './update-assignor/update-assignor.component';
+import { CreateAssignorComponent } from './create-assignor/create-assignor.component';
 
 interface Assignor {
   id: string;
@@ -74,8 +75,15 @@ export class AssignorsComponent implements OnInit {
   }
 
   openCreateAssignorDialog() {
-    // TODO: Implement dialog for creating assignors
-    console.log('Open create assignor dialog');
+    const dialogRef = this.dialog.open(CreateAssignorComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      autoFocus: false,
+      data: null,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 
   openEditAssignorDialog(assignor: Assignor) {

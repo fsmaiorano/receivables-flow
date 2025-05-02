@@ -40,7 +40,6 @@ export class UpdateAssignorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Pre-fill the form with existing assignor data
     if (this.data?.assignor) {
       this.assignorForm.patchValue({
         name: this.data.assignor.name,
@@ -66,7 +65,7 @@ export class UpdateAssignorComponent implements OnInit {
                 verticalPosition: 'top',
                 panelClass: ['success-snackbar'],
               });
-              this.dialogRef.close(true); // Close with success result
+              this.dialogRef.close(true);
             } else {
               this.snackBar.open(`Error: ${response.error}`, 'Close', {
                 duration: 5000,

@@ -1,1 +1,115 @@
-<p>create-assignor works!</p>
+<section class="create-assignor">
+  <div class="create-assignor-header">
+    <h2>Create Assignor</h2>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="false">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form
+    [formGroup]="assignorForm"
+    (ngSubmit)="onSubmit()"
+    class="update-assignor-form"
+  >
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Name</mat-label>
+      <input
+        matInput
+        formControlName="name"
+        required
+        placeholder="Enter assignor name"
+      />
+      <mat-error
+        *ngIf="
+          assignorForm.get('name')?.invalid &&
+          (assignorForm.get('name')?.touched || assignorForm.get('name')?.dirty)
+        "
+      >
+        Name is required.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Email</mat-label>
+      <input
+        matInput
+        formControlName="email"
+        required
+        placeholder="Enter assignor email"
+      />
+      <mat-icon matSuffix>email</mat-icon>
+      <mat-error
+        *ngIf="
+          assignorForm.get('email')?.invalid &&
+          (assignorForm.get('email')?.touched ||
+            assignorForm.get('email')?.dirty)
+        "
+      >
+        Email is required.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Phone</mat-label>
+      <input
+        matInput
+        formControlName="phone"
+        required
+        placeholder="Enter assignor phone"
+      />
+      <mat-icon matSuffix>phone</mat-icon>
+      <mat-error
+        *ngIf="
+          assignorForm.get('phone')?.invalid &&
+          (assignorForm.get('phone')?.touched ||
+            assignorForm.get('phone')?.dirty)
+        "
+      >
+        Phone is required.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Document</mat-label>
+      <input
+        matInput
+        formControlName="document"
+        required
+        placeholder="Enter assignor document"
+      />
+      <mat-icon matSuffix>description</mat-icon>
+      <mat-error
+        *ngIf="
+          assignorForm.get('document')?.invalid &&
+          (assignorForm.get('document')?.touched ||
+            assignorForm.get('document')?.dirty)
+        "
+      >
+        Document is required.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Action buttons at the bottom -->
+    <div class="update-assignor-actions">
+      <button
+        mat-button
+        type="button"
+        [mat-dialog-close]="false"
+        class="cancel-btn"
+        [disabled]="loading"
+      >
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="assignorForm.invalid || loading"
+        class="save-btn"
+      >
+        <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+        <span *ngIf="!loading">Save Changes</span>
+      </button>
+    </div>
+  </form>
+</section>
