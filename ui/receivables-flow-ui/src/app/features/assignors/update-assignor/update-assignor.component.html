@@ -1,4 +1,5 @@
 <section class="update-assignor">
+  <!-- Header with title and close button -->
   <div class="update-assignor-header">
     <h2>Update Assignor</h2>
     <button mat-icon-button class="close-button" [mat-dialog-close]="false">
@@ -6,6 +7,7 @@
     </button>
   </div>
 
+  <!-- Form with styled fields -->
   <form
     [formGroup]="assignorForm"
     (ngSubmit)="onSubmit()"
@@ -20,13 +22,8 @@
         placeholder="Enter assignor name"
       />
       <mat-icon matSuffix>person</mat-icon>
-      <mat-error
-        *ngIf="
-          assignorForm.get('name')?.invalid &&
-          (assignorForm.get('name')?.touched || assignorForm.get('name')?.dirty)
-        "
-      >
-        Name is required.
+      <mat-error *ngIf="(f['name'].touched || submitted) && f['name'].errors">
+        {{ getErrorMessage('name') }}
       </mat-error>
     </mat-form-field>
 
@@ -39,14 +36,8 @@
         placeholder="Enter assignor email"
       />
       <mat-icon matSuffix>email</mat-icon>
-      <mat-error
-        *ngIf="
-          assignorForm.get('email')?.invalid &&
-          (assignorForm.get('email')?.touched ||
-            assignorForm.get('email')?.dirty)
-        "
-      >
-        Email is required.
+      <mat-error *ngIf="(f['email'].touched || submitted) && f['email'].errors">
+        {{ getErrorMessage('email') }}
       </mat-error>
     </mat-form-field>
 
@@ -59,14 +50,8 @@
         placeholder="Enter assignor phone"
       />
       <mat-icon matSuffix>phone</mat-icon>
-      <mat-error
-        *ngIf="
-          assignorForm.get('phone')?.invalid &&
-          (assignorForm.get('phone')?.touched ||
-            assignorForm.get('phone')?.dirty)
-        "
-      >
-        Phone is required.
+      <mat-error *ngIf="(f['phone'].touched || submitted) && f['phone'].errors">
+        {{ getErrorMessage('phone') }}
       </mat-error>
     </mat-form-field>
 
@@ -80,13 +65,9 @@
       />
       <mat-icon matSuffix>description</mat-icon>
       <mat-error
-        *ngIf="
-          assignorForm.get('document')?.invalid &&
-          (assignorForm.get('document')?.touched ||
-            assignorForm.get('document')?.dirty)
-        "
+        *ngIf="(f['document'].touched || submitted) && f['document'].errors"
       >
-        Document is required.
+        {{ getErrorMessage('document') }}
       </mat-error>
     </mat-form-field>
 
@@ -105,7 +86,7 @@
         mat-raised-button
         color="primary"
         type="submit"
-        [disabled]="assignorForm.invalid || loading"
+        [disabled]="loading"
         class="save-btn"
       >
         <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
