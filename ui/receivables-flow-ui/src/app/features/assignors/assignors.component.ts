@@ -1,12 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { SharedModule } from '../../shared/shared.module';
 import { HttpClient } from '@angular/common/http';
 import { AssignorService } from '../core/data/http/assignor/assignor.service';
 import { UpdateAssignorComponent } from './update-assignor/update-assignor.component';
 import { CreateAssignorComponent } from './create-assignor/create-assignor.component';
+import { FormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 interface Assignor {
   id: string;
@@ -22,9 +24,17 @@ interface Assignor {
   templateUrl: './assignors.component.html',
   styleUrl: './assignors.component.scss',
 })
-export class AssignorsComponent implements OnInit {
+export class AssignorsComponent implements OnInit, AfterViewInit {
   assignors = new MatTableDataSource<Assignor>([]);
   displayedColumns: string[] = ['name', 'email', 'actions'];
+  totalItems = 0;
+  filterControl = new FormControl('');
+  currentFilter: string = '';
+
+  pageSize = 10;
+  pageSizeOptions: number[] = [5, 10, 20, 50];
+  pageIndex = 0;
+  isLoading = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -35,38 +45,94 @@ export class AssignorsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.setupFilterListener();
     this.loadAssignors();
   }
 
   ngAfterViewInit() {
-    this.assignors.paginator = this.paginator;
     if (this.paginator) {
-      this.paginator.page.subscribe(() => {
+      this.paginator.page.subscribe((event: PageEvent) => {
+        console.log('Page event:', event);
+        if (event.pageSize !== this.pageSize) {
+          console.log(
+            'Page size changed from',
+            this.pageSize,
+            'to',
+            event.pageSize,
+          );
+          this.pageSize = event.pageSize;
+          this.pageIndex = event.pageIndex;
+        } else {
+          this.pageIndex = event.pageIndex;
+        }
         this.loadAssignors();
       });
     }
   }
 
-  loadAssignors() {
-    const pageIndex = this.paginator?.pageIndex ?? 0;
-    const pageSize = this.paginator?.pageSize ?? 10;
-
-    this.assignorService.getAssignors(pageIndex + 1, pageSize).subscribe({
-      next: (response) => {
-        if (response.isSuccess && response.data) {
-          this.assignors.data = response.data.items;
-
-          if (this.paginator) {
-            this.paginator.length = response.data.meta.totalItems;
-          }
-        } else {
-          console.error('Failed to load assignors:', response.error);
+  setupFilterListener() {
+    this.filterControl.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((value) => {
+        this.currentFilter = value || '';
+        this.pageIndex = 0;
+        if (this.paginator) {
+          this.paginator.pageIndex = 0;
         }
-      },
-      error: (error) => {
-        console.error('Error loading assignors', error);
-      },
-    });
+        this.loadAssignors();
+      });
+  }
+
+  clearFilter() {
+    this.filterControl.setValue('');
+  }
+
+  loadAssignors() {
+    if (this.isLoading) {
+      return;
+    }
+
+    this.isLoading = true;
+
+    const currentPage = this.pageIndex + 1;
+    const filter = this.currentFilter;
+
+    console.log(
+      `Loading assignors: page=${currentPage}, size=${this.pageSize}, filter=${filter || 'none'}`,
+    );
+
+    this.assignorService
+      .getAssignors(currentPage, this.pageSize, filter)
+      .subscribe({
+        next: (response) => {
+          if (response.isSuccess && response.data) {
+            this.assignors.data = response.data.items;
+            this.totalItems = response.data.meta.totalItems;
+
+            console.log(
+              `Loaded ${response.data.items.length} assignors. Total: ${this.totalItems}`,
+            );
+
+            if (this.paginator) {
+              this.paginator.length = this.totalItems;
+
+              if (this.paginator.pageIndex !== this.pageIndex) {
+                this.paginator.pageIndex = this.pageIndex;
+              }
+              if (this.paginator.pageSize !== this.pageSize) {
+                this.paginator.pageSize = this.pageSize;
+              }
+            }
+          } else {
+            console.error('Failed to load assignors:', response.error);
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading assignors', error);
+          this.isLoading = false;
+        },
+      });
   }
 
   deleteAssignor(id: string) {
@@ -95,6 +161,10 @@ export class AssignorsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
+        this.pageIndex = 0;
+        if (this.paginator) {
+          this.paginator.pageIndex = 0;
+        }
         this.loadAssignors();
       }
     });

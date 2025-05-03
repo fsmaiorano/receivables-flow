@@ -3,7 +3,7 @@ import { CreateAssignorResponse } from './dtos/create-assignor.response';
 import { CreateAssignorRequest } from './dtos/create-assignor.request';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { Result } from 'src/shared/dto/result.generic';
 import { HttpStatusCode } from 'axios';
 import { GetAssignorResponse } from './dtos/get-assignor.response';
@@ -109,22 +109,36 @@ export class AssignorService {
 
   async getAllAssignors(
     paginationOptions?: PaginationRequestDto,
+    filter?: string,
   ): Promise<Result<PaginatedResponseDto<GetAssignorResponse>>> {
     try {
-      const page = paginationOptions?.page ?? 1;
-      const pageSize = paginationOptions?.pageSize ?? 10;
+      const page = Math.max(0, paginationOptions?.page ?? 0);
+      const pageSize = Math.max(1, paginationOptions?.pageSize ?? 10);
 
-      const skip = (page - 1) * pageSize;
+      const skip = page * pageSize;
 
-      const totalCount = await this.assignorRepository.count();
+      let whereClause = {};
+      if (filter) {
+        whereClause = [
+          { name: Like(`%${filter}%`) },
+          { email: Like(`%${filter}%`) },
+          { document: Like(`%${filter}%`) },
+        ];
+      }
 
-      const assignors = await this.assignorRepository.find({
-        skip: skip,
-        take: pageSize,
-        order: {
-          createdAt: 'DESC',
-        },
-      });
+      console.log(
+        `Backend query: page=${page}, pageSize=${pageSize}, skip=${skip}`,
+      );
+
+      const [assignors, totalCount] =
+        await this.assignorRepository.findAndCount({
+          where: whereClause,
+          skip: skip,
+          take: pageSize,
+          order: {
+            createdAt: 'DESC',
+          },
+        });
 
       const assignorResponses: GetAssignorResponse[] = assignors.map(
         (assignor) => ({

@@ -26,13 +26,21 @@ export class AssignorService {
   getAssignors(
     page: number,
     pageSize: number,
+    filter: string = '',
   ): Observable<Result<PaginatedResponseDto<AssignorResponse>>> {
     const options = {
       headers: this.getAuthorizationHeaders(),
     };
+    let url = `http://localhost:3333/integrations/assignor?page=${page - 1}&pageSize=${pageSize}`;
+
+    if (filter) {
+      url += `&filter=${encodeURIComponent(filter)}`;
+    }
+
+    console.log(`Requesting: ${url}`);
 
     return this.http.get<Result<PaginatedResponseDto<AssignorResponse>>>(
-      `http://localhost:3333/integrations/assignor?page=${page}&pageSize=${pageSize}`,
+      url,
       options,
     );
   }

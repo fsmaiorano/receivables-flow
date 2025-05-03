@@ -68,15 +68,22 @@ export class AssignorController {
     type: Number,
     description: 'Number of items per page',
   })
+  @ApiQuery({
+    name: 'filter',
+    required: false,
+    type: String,
+    description: 'Filter text to search for in name or email',
+  })
   getAllAssignors(
     @Query('page') page?: number,
     @Query('pageSize') pageSize?: number,
+    @Query('filter') filter?: string,
   ) {
     const paginationOptions: PaginationRequestDto = {
-      page: page !== undefined ? Number(page) : 1,
+      page: page !== undefined ? Number(page) : 0, // Default to page 0 (first page)
       pageSize: pageSize !== undefined ? Number(pageSize) : 10,
     };
 
-    return this.assignorService.getAllAssignors(paginationOptions);
+    return this.assignorService.getAllAssignors(paginationOptions, filter);
   }
 }
