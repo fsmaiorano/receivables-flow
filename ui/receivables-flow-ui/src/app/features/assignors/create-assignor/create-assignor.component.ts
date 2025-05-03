@@ -9,6 +9,7 @@ import {
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AssignorService } from '../../core/data/http/assignor/assignor.service';
+import { faker } from '@faker-js/faker';
 
 @Component({
   selector: 'app-create-assignor',
@@ -29,28 +30,30 @@ export class CreateAssignorComponent implements OnInit {
     private snackBar: MatSnackBar,
   ) {
     this.assignorForm = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      email: [
-        '',
-        [
-          Validators.required,
-          Validators.email,
-          Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$'),
-        ],
+      name: [
+        faker.person.fullName(),
+        [Validators.required, Validators.minLength(2)],
       ],
-      document: ['', [Validators.required, Validators.minLength(5)]],
-      phone: ['', [Validators.required, Validators.minLength(8)]],
+      email: [faker.internet.email(), [Validators.required, Validators.email]],
+      document: [
+        faker.number.int({ min: 1000000000, max: 9999999999 }),
+        [Validators.required, Validators.minLength(5)],
+      ],
+      phone: [
+        faker.phone.number({
+          style: 'international',
+        }),
+        [Validators.required, Validators.minLength(8)],
+      ],
     });
   }
 
   ngOnInit(): void {}
 
-  // Getter for easy access to form fields
   get f(): { [key: string]: AbstractControl } {
     return this.assignorForm.controls;
   }
 
-  // Get specific error messages for each field
   getErrorMessage(controlName: string): string {
     const control = this.f[controlName];
 
@@ -76,7 +79,6 @@ export class CreateAssignorComponent implements OnInit {
   onSubmit(): void {
     this.submitted = true;
 
-    // Mark all fields as touched to trigger validation display
     Object.keys(this.f).forEach((field) => {
       const control = this.assignorForm.get(field);
       control?.markAsTouched({ onlySelf: true });
@@ -117,7 +119,6 @@ export class CreateAssignorComponent implements OnInit {
         },
       });
     } else {
-      // If form is invalid, show general validation error
       this.snackBar.open('Please fix the validation errors', 'Close', {
         duration: 3000,
         horizontalPosition: 'end',

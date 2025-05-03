@@ -20,19 +20,19 @@ import { CreateAssignorRequest } from './dtos/create-assignor.request';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { PaginationRequestDto } from 'src/shared/dto/pagination.request';
 
-@ApiTags('Integrations')
+@ApiTags('Assignor')
 @ApiBearerAuth('access-token')
 @Controller('Integrations')
 export class AssignorController {
   constructor(private assignorService: AssignorService) {}
 
-  @Post()
+  @Post('assignor')
   @UseGuards(JwtAuthGuard)
   createAssignor(@Body() createAssignorRequest: CreateAssignorRequest) {
     return this.assignorService.createAssignor(createAssignorRequest);
   }
 
-  @Put(':id')
+  @Put('assignor/:id')
   @UseGuards(JwtAuthGuard)
   updateAssignor(
     @Param('id') id: string,

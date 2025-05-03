@@ -27,7 +27,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 import { DeduplicationService } from '../shared/services/deduplication.service';
 
-@ApiTags('Integrations')
+@ApiTags('Payable')
 @ApiBearerAuth('access-token')
 @Controller('Integrations')
 export class PayableController {
