@@ -62,7 +62,7 @@ export class AssignorsComponent implements OnInit, AfterViewInit {
 
   setupFilterListener() {
     this.filterControl.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged())
+      .pipe(debounceTime(800), distinctUntilChanged())
       .subscribe((value) => {
         this.currentFilter = value || '';
         this.pageIndex = 0;
