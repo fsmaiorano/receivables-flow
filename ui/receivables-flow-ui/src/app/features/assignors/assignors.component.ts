@@ -53,18 +53,8 @@ export class AssignorsComponent implements OnInit, AfterViewInit {
     if (this.paginator) {
       this.paginator.page.subscribe((event: PageEvent) => {
         console.log('Page event:', event);
-        if (event.pageSize !== this.pageSize) {
-          console.log(
-            'Page size changed from',
-            this.pageSize,
-            'to',
-            event.pageSize,
-          );
-          this.pageSize = event.pageSize;
-          this.pageIndex = event.pageIndex;
-        } else {
-          this.pageIndex = event.pageIndex;
-        }
+        this.pageSize = event.pageSize;
+        this.pageIndex = event.pageIndex;
         this.loadAssignors();
       });
     }
