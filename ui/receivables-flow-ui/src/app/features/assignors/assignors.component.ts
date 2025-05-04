@@ -53,8 +53,18 @@ export class AssignorsComponent implements OnInit, AfterViewInit {
     if (this.paginator) {
       this.paginator.page.subscribe((event: PageEvent) => {
         console.log('Page event:', event);
+
+        const pageSizeChanged = this.pageSize !== event.pageSize;
+
         this.pageSize = event.pageSize;
         this.pageIndex = event.pageIndex;
+
+        if (pageSizeChanged && this.pageIndex !== 0) {
+          console.log('Page size changed, resetting to first page');
+          this.pageIndex = 0;
+          this.paginator.pageIndex = 0;
+        }
+
         this.loadAssignors();
       });
     }
@@ -105,13 +115,8 @@ export class AssignorsComponent implements OnInit, AfterViewInit {
 
             if (this.paginator) {
               this.paginator.length = this.totalItems;
-
-              if (this.paginator.pageIndex !== this.pageIndex) {
-                this.paginator.pageIndex = this.pageIndex;
-              }
-              if (this.paginator.pageSize !== this.pageSize) {
-                this.paginator.pageSize = this.pageSize;
-              }
+              this.paginator.pageIndex = this.pageIndex;
+              this.paginator.pageSize = this.pageSize;
             }
           } else {
             console.error('Failed to load assignors:', response.error);
