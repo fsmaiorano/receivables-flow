@@ -9,6 +9,9 @@ import {
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PayableService } from '../../core/data/http/payable/payable.service';
+import { AssignorService } from '../../core/data/http/assignor/assignor.service';
+import { Observable, map, startWith } from 'rxjs';
+import { AssignorResponse } from '../../core/data/http/assignor/dto/assignors.response';
 
 @Component({
   selector: 'app-create-payable',
@@ -22,20 +25,79 @@ export class CreatePayableComponent implements OnInit {
   loading = false;
   submitted = false;
 
+  assignors: AssignorResponse[] = [];
+  filteredAssignors: Observable<AssignorResponse[]> = new Observable();
+
   constructor(
     private formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<CreatePayableComponent>,
     private payableService: PayableService,
+    private assignorService: AssignorService,
     private snackBar: MatSnackBar,
   ) {
     this.payableForm = this.formBuilder.group({
       value: [null, [Validators.required, Validators.min(0.01)]],
       emissionDate: [new Date(), [Validators.required]],
       assignorId: ['', [Validators.required]],
+      assignorName: ['', []],
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadAssignors();
+
+    this.filteredAssignors = this.payableForm
+      .get('assignorName')!
+      .valueChanges.pipe(
+        startWith(''),
+        map((value) => this._filterAssignors(value || '')),
+      );
+  }
+
+  loadAssignors(): void {
+    this.assignorService.getAssignors(1, 100).subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data) {
+          this.assignors = response.data.items;
+        } else {
+          this.snackBar.open('Failed to load assignors', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar'],
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading assignors', error);
+        this.snackBar.open('Failed to load assignors', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+          panelClass: ['error-snackbar'],
+        });
+      },
+    });
+  }
+
+  private _filterAssignors(value: string): AssignorResponse[] {
+    const filterValue = value.toLowerCase();
+    return this.assignors.filter((assignor) =>
+      assignor.name.toLowerCase().includes(filterValue),
+    );
+  }
+
+  onAssignorSelected(event: any): void {
+    const assignor = event.option.value;
+    this.payableForm.patchValue({
+      assignorId: assignor.id,
+      assignorName: assignor.name,
+    });
+  }
+
+  displayAssignor(assignor: AssignorResponse): string {
+    return assignor ? assignor.name : '';
+  }
 
   get f(): { [key: string]: AbstractControl } {
     return this.payableForm.controls;
@@ -70,7 +132,10 @@ export class CreatePayableComponent implements OnInit {
     if (this.payableForm.valid) {
       this.loading = true;
 
-      this.payableService.createPayable(this.payableForm.value).subscribe({
+      const formData = { ...this.payableForm.value };
+      delete formData.assignorName;
+
+      this.payableService.createPayable(formData).subscribe({
         next: (response) => {
           if (response.isSuccess) {
             this.snackBar.open('Payable created successfully', 'Close', {

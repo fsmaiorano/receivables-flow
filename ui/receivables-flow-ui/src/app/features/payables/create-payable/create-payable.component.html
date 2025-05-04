@@ -48,14 +48,28 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="form-field">
-      <mat-label>Assignor ID</mat-label>
+      <mat-label>Assignor</mat-label>
       <input
+        type="text"
         matInput
-        formControlName="assignorId"
+        formControlName="assignorName"
+        [matAutocomplete]="auto"
+        placeholder="Search for an assignor"
         required
-        placeholder="Enter assignor ID"
       />
-      <mat-icon matSuffix>person</mat-icon>
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        [displayWith]="displayAssignor.bind(this)"
+        (optionSelected)="onAssignorSelected($event)"
+      >
+        <mat-option
+          *ngFor="let assignor of filteredAssignors | async"
+          [value]="assignor"
+        >
+          {{ assignor.name }}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-icon matSuffix>search</mat-icon>
       <mat-error
         *ngIf="(f['assignorId'].touched || submitted) && f['assignorId'].errors"
       >
