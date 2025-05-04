@@ -56,12 +56,17 @@
         [matAutocomplete]="auto"
         placeholder="Search for an assignor"
         required
+        (click)="onInputClick()"
+        (focus)="onInputClick()"
       />
       <mat-autocomplete
         #auto="matAutocomplete"
         [displayWith]="displayAssignor.bind(this)"
         (optionSelected)="onAssignorSelected($event)"
       >
+        <mat-option *ngIf="assignors.length === 0" disabled>
+          Loading assignors...
+        </mat-option>
         <mat-option
           *ngFor="let assignor of filteredAssignors | async"
           [value]="assignor"
