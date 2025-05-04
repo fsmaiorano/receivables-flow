@@ -3,7 +3,7 @@ import { CreatePayableRequest } from './dtos/create-payable.request';
 import { PayableMapper } from './infrastructure/mappers/payable.mapper';
 import { AssignorService } from '../assignor/assignor.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like, ILike } from 'typeorm';
 import { Payable } from './domain/entities/payable.entity';
 import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
@@ -20,6 +20,40 @@ export class PayableService {
     @Inject('ReceivablesFlow') private client: ClientProxy,
     private readonly correlationIdService: CorrelationIdService,
   ) {}
+
+  async getAllPayables(page: number, pageSize: number, filter: string = '') {
+    const skipCount = page * pageSize;
+    let queryBuilder = this.payableRepository.createQueryBuilder('payable');
+
+    if (filter) {
+      // Apply filter if provided - this is a simple implementation
+      // You might want to expand this to filter by assignorId, value ranges, date ranges, etc.
+      queryBuilder = queryBuilder
+        .where('CAST(payable.value AS TEXT) LIKE :filter', {
+          filter: `%${filter}%`,
+        })
+        .orWhere('CAST(payable.emissionDate AS TEXT) LIKE :filter', {
+          filter: `%${filter}%`,
+        });
+    }
+
+    const [items, total] = await queryBuilder
+      .skip(skipCount)
+      .take(pageSize)
+      .orderBy('payable.createdAt', 'DESC')
+      .getManyAndCount();
+
+    return {
+      items,
+      meta: {
+        totalItems: total,
+        itemCount: items.length,
+        itemsPerPage: pageSize,
+        totalPages: Math.ceil(total / pageSize),
+        currentPage: page,
+      },
+    };
+  }
 
   async createPayable(createPayableRequest: CreatePayableRequest) {
     const existingPayable = await this.payableRepository.findOne({
@@ -55,6 +89,31 @@ export class PayableService {
       throw new NotFoundException(`Payable with id ${id} not found`);
     }
     return payable;
+  }
+
+  async updatePayable(id: string, updatePayableRequest: CreatePayableRequest) {
+    const payable = await this.getById(id);
+
+    // Verify the assignor exists
+    await this.assignorService.verifyExists({
+      assignorId: updatePayableRequest.assignorId,
+    });
+
+    // Update the entity
+    Object.assign(payable, {
+      value: updatePayableRequest.value,
+      emissionDate: updatePayableRequest.emissionDate,
+      assignorId: updatePayableRequest.assignorId,
+    });
+
+    const updatedPayable = await this.payableRepository.save(payable);
+    return updatedPayable;
+  }
+
+  async deletePayable(id: string) {
+    const payable = await this.getById(id);
+    const result = await this.payableRepository.remove(payable);
+    return { success: true, id };
   }
 
   async createBatchPayableFromCsv(

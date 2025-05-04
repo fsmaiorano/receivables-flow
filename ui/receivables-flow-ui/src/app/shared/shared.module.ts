@@ -21,6 +21,7 @@ import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   provideHttpClient,
   withInterceptorsFromDi,
@@ -51,6 +52,7 @@ import {
     RouterModule,
     MatTableModule,
     MatPaginatorModule,
+    MatDatepickerModule,
   ],
   exports: [
     CommonModule,
@@ -75,6 +77,7 @@ import {
     RouterModule,
     MatTableModule,
     MatPaginatorModule,
+    MatDatepickerModule,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })

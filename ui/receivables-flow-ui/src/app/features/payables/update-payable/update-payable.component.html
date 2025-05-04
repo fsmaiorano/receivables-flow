@@ -1,0 +1,89 @@
+<section class="update-payable">
+  <!-- Header with title and close button -->
+  <div class="update-payable-header">
+    <h2>Update Payable</h2>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="false">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Form with styled fields -->
+  <form
+    [formGroup]="payableForm"
+    (ngSubmit)="onSubmit()"
+    class="update-payable-form"
+  >
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Value</mat-label>
+      <input
+        matInput
+        type="number"
+        formControlName="value"
+        required
+        placeholder="Enter payable value"
+        step="0.01"
+      />
+      <mat-icon matSuffix>attach_money</mat-icon>
+      <mat-error *ngIf="f['value'].touched && f['value'].errors">
+        {{ getErrorMessage('value') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Emission Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="emissionDatePicker"
+        formControlName="emissionDate"
+        required
+        placeholder="Choose a date"
+      />
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="emissionDatePicker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #emissionDatePicker></mat-datepicker>
+      <mat-error *ngIf="f['emissionDate'].touched && f['emissionDate'].errors">
+        {{ getErrorMessage('emissionDate') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Assignor ID</mat-label>
+      <input
+        matInput
+        formControlName="assignorId"
+        required
+        placeholder="Enter assignor ID"
+      />
+      <mat-icon matSuffix>person</mat-icon>
+      <mat-error *ngIf="f['assignorId'].touched && f['assignorId'].errors">
+        {{ getErrorMessage('assignorId') }}
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Action buttons at the bottom -->
+    <div class="update-payable-actions">
+      <button
+        mat-button
+        type="button"
+        [mat-dialog-close]="false"
+        class="cancel-btn"
+        [disabled]="loading"
+      >
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="loading || payableForm.invalid"
+        class="save-btn"
+      >
+        <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+        <span *ngIf="!loading">Update Payable</span>
+      </button>
+    </div>
+  </form>
+</section>

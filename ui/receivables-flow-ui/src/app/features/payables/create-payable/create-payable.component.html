@@ -1,0 +1,88 @@
+<section class="create-payable">
+  <div class="create-payable-header">
+    <h2>Create Payable</h2>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="false">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form
+    [formGroup]="payableForm"
+    (ngSubmit)="onSubmit()"
+    class="create-payable-form"
+  >
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Value</mat-label>
+      <input
+        matInput
+        type="number"
+        formControlName="value"
+        required
+        placeholder="Enter payable value"
+        step="0.01"
+      />
+      <mat-icon matSuffix>attach_money</mat-icon>
+      <mat-error *ngIf="(f['value'].touched || submitted) && f['value'].errors">
+        {{ getErrorMessage('value') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Emission Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="emissionDate"
+        required
+        placeholder="Choose a date"
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error
+        *ngIf="
+          (f['emissionDate'].touched || submitted) && f['emissionDate'].errors
+        "
+      >
+        {{ getErrorMessage('emissionDate') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Assignor ID</mat-label>
+      <input
+        matInput
+        formControlName="assignorId"
+        required
+        placeholder="Enter assignor ID"
+      />
+      <mat-icon matSuffix>person</mat-icon>
+      <mat-error
+        *ngIf="(f['assignorId'].touched || submitted) && f['assignorId'].errors"
+      >
+        {{ getErrorMessage('assignorId') }}
+      </mat-error>
+    </mat-form-field>
+
+    <div class="create-payable-actions">
+      <button
+        mat-button
+        type="button"
+        [mat-dialog-close]="false"
+        class="cancel-btn"
+        [disabled]="loading"
+      >
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="loading"
+        class="save-btn"
+      >
+        <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+        <span *ngIf="!loading">Create Payable</span>
+      </button>
+    </div>
+  </form>
+</section>

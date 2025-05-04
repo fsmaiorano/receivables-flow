@@ -4,6 +4,7 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { authenticatedUserGuard } from './features/user/guards/authenticated-user.guard';
 import { AssignorsComponent } from './features/assignors/assignors.component';
 import { ReceivablesComponent } from './features/receivables/receivables.component';
+import { PayablesComponent } from './features/payables/payables.component';
 
 export const routes: Routes = [
   {
@@ -23,6 +24,11 @@ export const routes: Routes = [
   {
     path: 'receivables',
     component: ReceivablesComponent,
+    canActivate: [authenticatedUserGuard],
+  },
+  {
+    path: 'payables',
+    component: PayablesComponent,
     canActivate: [authenticatedUserGuard],
   },
   {

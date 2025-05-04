@@ -37,7 +37,6 @@ export class AuthComponent {
       this.userService
         .authentication(username, password)
         .subscribe((response) => {
-          debugger;
           if (!response.isSuccess) {
             console.error('Authentication failed');
             return;

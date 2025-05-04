@@ -3,6 +3,9 @@ import {
   Get,
   Param,
   Post,
+  Put,
+  Delete,
+  Query,
   NotFoundException,
   Body,
   UseGuards,
@@ -19,12 +22,13 @@ import {
   ApiConsumes,
   ApiBody,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
 import { FileInterceptor } from '@nestjs/platform-express';
-
+import { PaginationRequestDto } from '../shared/dto/pagination.request';
 import { DeduplicationService } from '../shared/services/deduplication.service';
 
 @ApiTags('Payable')
@@ -35,6 +39,20 @@ export class PayableController {
     private payableService: PayableService,
     private deduplicationService: DeduplicationService,
   ) {}
+
+  @Get('payable')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get all payables with pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiQuery({ name: 'filter', required: false, type: String })
+  async getAllPayables(@Query() query: PaginationRequestDto) {
+    const page = query.page || 0;
+    const pageSize = query.pageSize || 10;
+    const filter = query.filter || '';
+
+    return this.payableService.getAllPayables(page, pageSize, filter);
+  }
 
   @Post('payable')
   @UseGuards(JwtAuthGuard)
@@ -68,6 +86,23 @@ export class PayableController {
       }
       throw error;
     }
+  }
+
+  @Put('payable/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update a payable' })
+  async updatePayable(
+    @Param('id') id: string,
+    @Body() updatePayableRequest: CreatePayableRequest,
+  ) {
+    return this.payableService.updatePayable(id, updatePayableRequest);
+  }
+
+  @Delete('payable/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Delete a payable' })
+  async deletePayable(@Param('id') id: string) {
+    return this.payableService.deletePayable(id);
   }
 
   @Post('payable/batch')
