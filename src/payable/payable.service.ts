@@ -80,7 +80,9 @@ export class PayableService {
     }
   }
 
-  async createPayable(createPayableRequest: CreatePayableRequest) {
+  async createPayable(
+    createPayableRequest: CreatePayableRequest,
+  ): Promise<Result<Payable>> {
     try {
       const existingPayable = await this.payableRepository.findOne({
         where: {
@@ -92,7 +94,10 @@ export class PayableService {
 
       if (!!existingPayable) {
         console.log('Duplicate payable detected, fetching existing record');
-        return existingPayable;
+        return Result.failure(
+          'Payable already exists',
+          HttpStatusCode.Conflict,
+        );
       }
 
       const assignor = await this.assignorService.verifyExists({
@@ -100,16 +105,20 @@ export class PayableService {
       });
 
       if (!assignor) {
-        throw new Error('Assignor not found');
+        return Result.failure('Assignor not found', HttpStatusCode.NotFound);
       }
 
       const payableData = PayableMapper.toPersistence(createPayableRequest);
       const newPayable = this.payableRepository.create(payableData);
 
-      return await this.payableRepository.save(newPayable);
+      const savedPayable = await this.payableRepository.save(newPayable);
+      return Result.success(savedPayable);
     } catch (error) {
       console.error('Error creating payable:', error);
-      throw new Error(`Failed to create payable: ${error.message}`);
+      return Result.failure(
+        error.message || 'Failed to create payable',
+        HttpStatusCode.InternalServerError,
+      );
     }
   }
 

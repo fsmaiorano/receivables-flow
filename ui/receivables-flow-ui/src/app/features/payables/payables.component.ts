@@ -9,6 +9,12 @@ import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { UpdatePayableComponent } from './update-payable/update-payable.component';
 import { CreatePayableComponent } from './create-payable/create-payable.component';
+import {
+  PaginatedResponseDto,
+  PaginationMetaDto,
+} from '../core/dto/pagination.response';
+import { Result } from '../core/dto/result.generic';
+import { PayableResponse } from '../core/data/http/payable/dto/payable.response';
 
 interface Payable {
   id: string;
@@ -106,7 +112,7 @@ export class PayablesComponent implements OnInit, AfterViewInit {
     this.payableService
       .getPayables(currentPage, this.pageSize, filter)
       .subscribe({
-        next: (response) => {
+        next: (response: Result<PaginatedResponseDto<PayableResponse>>) => {
           if (response.isSuccess && response.data) {
             this.payables.data = response.data.items;
             this.totalItems = response.data.meta.totalItems;

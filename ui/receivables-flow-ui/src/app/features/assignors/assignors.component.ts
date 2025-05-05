@@ -9,6 +9,9 @@ import { UpdateAssignorComponent } from './update-assignor/update-assignor.compo
 import { CreateAssignorComponent } from './create-assignor/create-assignor.component';
 import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { AssignorResponse } from '../core/data/http/assignor/dto/assignors.response';
+import { PaginatedResponseDto } from '../core/dto/pagination.response';
+import { Result } from '../core/dto/result.generic';
 
 interface Assignor {
   id: string;
@@ -104,7 +107,7 @@ export class AssignorsComponent implements OnInit, AfterViewInit {
     this.assignorService
       .getAssignors(currentPage, this.pageSize, filter)
       .subscribe({
-        next: (response) => {
+        next: (response: Result<PaginatedResponseDto<AssignorResponse>>) => {
           if (response.isSuccess && response.data) {
             this.assignors.data = response.data.items;
             this.totalItems = response.data.meta.totalItems;

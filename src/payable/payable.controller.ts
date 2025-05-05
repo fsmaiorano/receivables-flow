@@ -29,6 +29,7 @@ import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PaginationRequestDto } from '../shared/dto/pagination.request';
+import { Result } from 'src/shared/dto/result.generic';
 
 @ApiTags('Payable')
 @ApiBearerAuth('access-token')
@@ -55,18 +56,11 @@ export class PayableController {
   @ApiOperation({ summary: 'Create a new payable' })
   async createPayable(
     @Body() createPayableRequest: CreatePayableRequest,
-  ): Promise<CreatePayableResponse> {
+  ): Promise<Result<CreatePayableResponse>> {
     const payable =
       await this.payableService.createPayable(createPayableRequest);
 
-    return {
-      id: payable.id,
-      value: payable.value,
-      emissionDate: payable.emissionDate,
-      assignorId: payable.assignorId,
-      createdAt: payable.createdAt,
-      updatedAt: payable.updatedAt,
-    };
+    return payable;
   }
 
   @Get('payable/:id')

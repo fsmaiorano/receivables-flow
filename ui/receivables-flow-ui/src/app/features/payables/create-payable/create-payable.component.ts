@@ -187,6 +187,7 @@ export class CreatePayableComponent implements OnInit, AfterViewInit {
 
       this.payableService.createPayable(formData).subscribe({
         next: (response) => {
+          debugger;
           if (response.isSuccess) {
             this.snackBar.open('Payable created successfully', 'Close', {
               duration: 3000,
