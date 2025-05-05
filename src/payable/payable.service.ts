@@ -50,16 +50,22 @@ export class PayableService {
         .orderBy('payable.createdAt', 'DESC')
         .getManyAndCount();
 
-      const payableResponses: GetPayableResponse[] = payables.map((payable) => {
+      const payableResponsePromises = payables.map(async (payable) => {
+        const assignor = payable.assignorId
+          ? await this.assignorService.getAssignorById(payable.assignorId)
+          : null;
         return {
           id: payable.id,
           value: payable.value,
           emissionDate: payable.emissionDate,
           assignorId: payable.assignorId,
+          assignor: assignor,
           createdAt: payable.createdAt,
           updatedAt: payable.updatedAt,
         };
       });
+
+      const payableResponses = await Promise.all(payableResponsePromises);
 
       const paginatedResponse = PaginatedResponseDto.create(
         payableResponses,

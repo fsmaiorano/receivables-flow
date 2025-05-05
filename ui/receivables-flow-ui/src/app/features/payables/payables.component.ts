@@ -12,6 +12,7 @@ import { CreatePayableComponent } from './create-payable/create-payable.componen
 import { PaginatedResponseDto } from '../core/dto/pagination.response';
 import { Result } from '../core/dto/result.generic';
 import { PayableResponse } from '../core/data/http/payable/dto/payable.response';
+import { DetailPayableComponent } from './detail-payable/detail-payable.component';
 
 interface Payable {
   id: string;
@@ -172,6 +173,21 @@ export class PayablesComponent implements OnInit, AfterViewInit {
 
   openEditPayableDialog(payable: Payable) {
     const dialogRef = this.dialog.open(UpdatePayableComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      autoFocus: false,
+      data: payable,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.loadPayables();
+      }
+    });
+  }
+
+  openDetailPayableDialog(payable: Payable) {
+    const dialogRef = this.dialog.open(DetailPayableComponent, {
       width: '500px',
       maxWidth: '90vw',
       autoFocus: false,

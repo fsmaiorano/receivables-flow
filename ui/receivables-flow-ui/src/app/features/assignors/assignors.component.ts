@@ -13,7 +13,7 @@ import { AssignorResponse } from '../core/data/http/assignor/dto/assignors.respo
 import { PaginatedResponseDto } from '../core/dto/pagination.response';
 import { Result } from '../core/dto/result.generic';
 
-interface Assignor {
+export interface Assignor {
   id: string;
   name: string;
   email: string;
