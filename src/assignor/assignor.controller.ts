@@ -80,8 +80,9 @@ export class AssignorController {
     @Query('filter') filter?: string,
   ) {
     const paginationOptions: PaginationRequestDto = {
-      page: page !== undefined ? Number(page) : 0, // Default to page 0 (first page)
+      page: page !== undefined ? Number(page) : 0,
       pageSize: pageSize !== undefined ? Number(pageSize) : 10,
+      filter: filter || '',
     };
 
     return this.assignorService.getAllAssignors(paginationOptions, filter);
