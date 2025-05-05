@@ -58,7 +58,6 @@ export class SidenavComponent implements OnInit, OnDestroy {
     this.ngZone.run(() => {
       if (window.innerWidth < this.SMALL_SCREEN_BREAKPOINT) {
         this.sidenav.mode = 'over';
-        this.sidenav.disableClose = true;
       }
       if (window.innerWidth >= this.SMALL_SCREEN_BREAKPOINT) {
         this.sidenav.mode = 'side';
