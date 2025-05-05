@@ -29,16 +29,12 @@ import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PaginationRequestDto } from '../shared/dto/pagination.request';
-import { DeduplicationService } from '../shared/services/deduplication.service';
 
 @ApiTags('Payable')
 @ApiBearerAuth('access-token')
 @Controller('Integrations')
 export class PayableController {
-  constructor(
-    private payableService: PayableService,
-    private deduplicationService: DeduplicationService,
-  ) {}
+  constructor(private payableService: PayableService) {}
 
   @Get('payable')
   @UseGuards(JwtAuthGuard)
@@ -51,7 +47,7 @@ export class PayableController {
     const pageSize = query.pageSize || 10;
     const filter = query.filter || '';
 
-    return this.payableService.getAllPayables(page, pageSize, filter);
+    return this.payableService.getAllPayables({ page, pageSize, filter });
   }
 
   @Post('payable')

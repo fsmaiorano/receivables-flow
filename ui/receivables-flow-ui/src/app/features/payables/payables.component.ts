@@ -105,6 +105,7 @@ export class PayablesComponent implements OnInit, AfterViewInit {
       .getPayables(currentPage, this.pageSize, filter)
       .subscribe({
         next: (response) => {
+          debugger;
           if (response.isSuccess && response.data) {
             this.payables.data = response.data.items;
             this.totalItems = response.data.meta.totalItems;

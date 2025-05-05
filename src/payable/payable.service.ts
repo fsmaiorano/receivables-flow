@@ -3,13 +3,18 @@ import { CreatePayableRequest } from './dtos/create-payable.request';
 import { PayableMapper } from './infrastructure/mappers/payable.mapper';
 import { AssignorService } from '../assignor/assignor.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, ILike } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Payable } from './domain/entities/payable.entity';
 import { CreatePayableBatchRequest } from './dtos/create-payable-batch.request';
 import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 import { CreatePayableBatchResponse } from './dtos/create-payable-batch.response';
 import { firstValueFrom } from 'rxjs';
 import { CorrelationIdService } from '../shared/services/correlation-id.service';
+import { PaginationRequestDto } from 'src/shared/dto/pagination.request';
+import { Result } from 'src/shared/dto/result.generic';
+import { PaginatedResponseDto } from 'src/shared/dto/pagination.response';
+import { GetPayableResponse } from './dtos/get-payable.response';
+import { HttpStatusCode } from 'axios';
 
 @Injectable()
 export class PayableService {
@@ -21,66 +26,91 @@ export class PayableService {
     private readonly correlationIdService: CorrelationIdService,
   ) {}
 
-  async getAllPayables(page: number, pageSize: number, filter: string = '') {
-    const skipCount = page * pageSize;
-    let queryBuilder = this.payableRepository.createQueryBuilder('payable');
+  async getAllPayables(
+    pagination: PaginationRequestDto,
+  ): Promise<Result<PaginatedResponseDto<GetPayableResponse>>> {
+    try {
+      const { page, pageSize, filter } = pagination;
+      const skipCount = page * pageSize;
+      let queryBuilder = this.payableRepository.createQueryBuilder('payable');
 
-    if (filter) {
-      // Apply filter if provided - this is a simple implementation
-      // You might want to expand this to filter by assignorId, value ranges, date ranges, etc.
-      queryBuilder = queryBuilder
-        .where('CAST(payable.value AS TEXT) LIKE :filter', {
-          filter: `%${filter}%`,
-        })
-        .orWhere('CAST(payable.emissionDate AS TEXT) LIKE :filter', {
-          filter: `%${filter}%`,
-        });
+      if (filter) {
+        queryBuilder = queryBuilder
+          .where('CAST(payable.value AS TEXT) LIKE :filter', {
+            filter: `%${filter}%`,
+          })
+          .orWhere('CAST(payable.emissionDate AS TEXT) LIKE :filter', {
+            filter: `%${filter}%`,
+          });
+      }
+
+      const [payables, total] = await queryBuilder
+        .skip(skipCount)
+        .take(pageSize)
+        .orderBy('payable.createdAt', 'DESC')
+        .getManyAndCount();
+
+      const payableResponses: GetPayableResponse[] = payables.map((payable) => {
+        return {
+          id: payable.id,
+          value: payable.value,
+          emissionDate: payable.emissionDate,
+          assignorId: payable.assignorId,
+          createdAt: payable.createdAt,
+          updatedAt: payable.updatedAt,
+        };
+      });
+
+      const paginatedResponse = PaginatedResponseDto.create(
+        payableResponses,
+        total,
+        page,
+        pageSize,
+      );
+
+      return Result.success<PaginatedResponseDto<GetPayableResponse>>(
+        paginatedResponse,
+      );
+    } catch (error) {
+      console.error('Error fetching payables:', error);
+      return Result.failure(
+        error.message || 'Failed to retrieve payables',
+        HttpStatusCode.InternalServerError,
+      );
     }
-
-    const [items, total] = await queryBuilder
-      .skip(skipCount)
-      .take(pageSize)
-      .orderBy('payable.createdAt', 'DESC')
-      .getManyAndCount();
-
-    return {
-      items,
-      meta: {
-        totalItems: total,
-        itemCount: items.length,
-        itemsPerPage: pageSize,
-        totalPages: Math.ceil(total / pageSize),
-        currentPage: page,
-      },
-    };
   }
 
   async createPayable(createPayableRequest: CreatePayableRequest) {
-    const existingPayable = await this.payableRepository.findOne({
-      where: {
-        value: createPayableRequest.value,
-        emissionDate: createPayableRequest.emissionDate,
+    try {
+      const existingPayable = await this.payableRepository.findOne({
+        where: {
+          value: createPayableRequest.value,
+          emissionDate: createPayableRequest.emissionDate,
+          assignorId: createPayableRequest.assignorId,
+        },
+      });
+
+      if (!!existingPayable) {
+        console.log('Duplicate payable detected, fetching existing record');
+        return existingPayable;
+      }
+
+      const assignor = await this.assignorService.verifyExists({
         assignorId: createPayableRequest.assignorId,
-      },
-    });
+      });
 
-    if (!!existingPayable) {
-      console.log('Duplicate payable detected, fetching existing record');
-      return existingPayable;
+      if (!assignor) {
+        throw new Error('Assignor not found');
+      }
+
+      const payableData = PayableMapper.toPersistence(createPayableRequest);
+      const newPayable = this.payableRepository.create(payableData);
+
+      return await this.payableRepository.save(newPayable);
+    } catch (error) {
+      console.error('Error creating payable:', error);
+      throw new Error(`Failed to create payable: ${error.message}`);
     }
-
-    const assignor = await this.assignorService.verifyExists({
-      assignorId: createPayableRequest.assignorId,
-    });
-
-    if (!assignor) {
-      throw new Error('Assignor not found');
-    }
-
-    const payableData = PayableMapper.toPersistence(createPayableRequest);
-    const newPayable = this.payableRepository.create(payableData);
-
-    return await this.payableRepository.save(newPayable);
   }
 
   async getById(id: string) {
@@ -94,12 +124,10 @@ export class PayableService {
   async updatePayable(id: string, updatePayableRequest: CreatePayableRequest) {
     const payable = await this.getById(id);
 
-    // Verify the assignor exists
     await this.assignorService.verifyExists({
       assignorId: updatePayableRequest.assignorId,
     });
 
-    // Update the entity
     Object.assign(payable, {
       value: updatePayableRequest.value,
       emissionDate: updatePayableRequest.emissionDate,
@@ -112,7 +140,7 @@ export class PayableService {
 
   async deletePayable(id: string) {
     const payable = await this.getById(id);
-    const result = await this.payableRepository.remove(payable);
+    await this.payableRepository.remove(payable);
     return { success: true, id };
   }
 
