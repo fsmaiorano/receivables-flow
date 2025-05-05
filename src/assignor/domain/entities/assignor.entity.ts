@@ -25,7 +25,10 @@ export class Assignor {
   @Column()
   name: string;
 
-  @OneToMany(() => Payable, (payable) => payable.assignor)
+  @OneToMany(() => Payable, (payable) => payable.assignor, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   payables: Payable[];
 
   @CreateDateColumn()

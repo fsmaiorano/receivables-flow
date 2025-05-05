@@ -20,7 +20,9 @@ export class Payable {
   @Column({ type: 'datetime' })
   emissionDate: Date;
 
-  @ManyToOne(() => Assignor, (assignor) => assignor.payables)
+  @ManyToOne(() => Assignor, (assignor) => assignor.payables, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'assignorId' })
   assignor: Assignor;
 
