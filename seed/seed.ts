@@ -33,10 +33,18 @@ async function seed() {
       name: faker.company.name(),
     };
 
-    await dataSource.query(
-      `INSERT INTO user (id,username, password, email, name) VALUES (?, ?, ?, ?, ?)`,
-      [randomUUID(), user.username, user.password, user.email, user.name],
+    const userExists = await dataSource.query(
+      `SELECT * FROM user WHERE username = ?`,
+      [user.username],
     );
+    if (userExists.length > 0) {
+      console.log(`User ${user.username} already exists`);
+    } else {
+      await dataSource.query(
+        `INSERT INTO user (id,username, password, email, name) VALUES (?, ?, ?, ?, ?)`,
+        [randomUUID(), user.username, user.password, user.email, user.name],
+      );
+    }
 
     const newAssignors = [];
     for (let i = 0; i < 3; i++) {
