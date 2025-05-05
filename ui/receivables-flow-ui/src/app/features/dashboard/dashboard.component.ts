@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SharedModule } from '../../shared/shared.module';
 import { MatDialog } from '@angular/material/dialog';
-import { ReceivablesComponent } from '../receivables/receivables.component';
+import { PayablesComponent } from '../payables/payables.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,7 +13,7 @@ import { ReceivablesComponent } from '../receivables/receivables.component';
 export class DashboardComponent {
   readonly dialog = inject(MatDialog);
   openDialog() {
-    const dialogRef = this.dialog.open(ReceivablesComponent, {
+    const dialogRef = this.dialog.open(PayablesComponent, {
       width: '1200px',
       maxWidth: '90vw',
       autoFocus: false,
