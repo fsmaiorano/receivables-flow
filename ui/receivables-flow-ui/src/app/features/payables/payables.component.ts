@@ -7,6 +7,8 @@ import { HttpClient } from '@angular/common/http';
 import { PayableService } from '../core/data/http/payable/payable.service';
 import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { UpdatePayableComponent } from './update-payable/update-payable.component';
+import { CreatePayableComponent } from './create-payable/create-payable.component';
 
 interface Payable {
   id: string;
@@ -149,43 +151,35 @@ export class PayablesComponent implements OnInit, AfterViewInit {
   }
 
   openCreatePayableDialog() {
-    import('./create-payable/create-payable.component').then(
-      ({ CreatePayableComponent }) => {
-        const dialogRef = this.dialog.open(CreatePayableComponent, {
-          width: '500px',
-          maxWidth: '90vw',
-          autoFocus: false,
-        });
+    const dialogRef = this.dialog.open(CreatePayableComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      autoFocus: false,
+    });
 
-        dialogRef.afterClosed().subscribe((result) => {
-          if (result) {
-            this.pageIndex = 0;
-            if (this.paginator) {
-              this.paginator.pageIndex = 0;
-            }
-            this.loadPayables();
-          }
-        });
-      },
-    );
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.pageIndex = 0;
+        if (this.paginator) {
+          this.paginator.pageIndex = 0;
+        }
+        this.loadPayables();
+      }
+    });
   }
 
   openEditPayableDialog(payable: Payable) {
-    import('./update-payable/update-payable.component').then(
-      ({ UpdatePayableComponent }) => {
-        const dialogRef = this.dialog.open(UpdatePayableComponent, {
-          width: '500px',
-          maxWidth: '90vw',
-          autoFocus: false,
-          data: payable,
-        });
+    const dialogRef = this.dialog.open(UpdatePayableComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      autoFocus: false,
+      data: payable,
+    });
 
-        dialogRef.afterClosed().subscribe((result) => {
-          if (result) {
-            this.loadPayables();
-          }
-        });
-      },
-    );
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.loadPayables();
+      }
+    });
   }
 }
