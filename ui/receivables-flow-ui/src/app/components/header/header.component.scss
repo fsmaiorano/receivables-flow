@@ -9,7 +9,7 @@
   .left-section {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
   .toggle-btn {
@@ -28,6 +28,16 @@
       font-size: 25px;
       width: 25px;
       height: 25px;
+    }
+  }
+}
+
+.toggle-btn {
+  .menu-icon {
+    transition: transform 0.3s ease-in-out;
+
+    &.rotated {
+      transform: rotate(90deg);
     }
   }
 }

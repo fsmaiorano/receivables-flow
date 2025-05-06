@@ -1,7 +1,7 @@
 <mat-toolbar class="container">
   <div class="left-section">
-    <button mat-button class="toggle-btn" (click)="toggleSidenav()">
-      Menu
+    <button mat-icon-button class="toggle-btn" (click)="toggleSidenav()">
+      <mat-icon class="menu-icon" [class.rotated]="isMenuOpen">menu</mat-icon>
     </button>
     <h1>Receivables</h1>
   </div>

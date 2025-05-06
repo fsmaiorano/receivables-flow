@@ -6,10 +6,16 @@ import { Subject } from 'rxjs';
 })
 export class SidenavService {
   private toggleSource = new Subject<void>();
+  private stateChangeSource = new Subject<boolean>();
 
   toggleSidenav$ = this.toggleSource.asObservable();
+  stateChange$ = this.stateChangeSource.asObservable();
 
   toggle() {
     this.toggleSource.next();
+  }
+
+  notifyStateChange(isOpen: boolean) {
+    this.stateChangeSource.next(isOpen);
   }
 }

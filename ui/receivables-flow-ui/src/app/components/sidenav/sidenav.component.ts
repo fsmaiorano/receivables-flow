@@ -39,6 +39,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
       () => {
         if (this.sidenav) {
           this.sidenav.toggle();
+          // Notify about state change after toggle
+          this.sidenavService.notifyStateChange(this.sidenav.opened);
         }
       },
     );
@@ -58,6 +60,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
     this.ngZone.run(() => {
       if (window.innerWidth < this.SMALL_SCREEN_BREAKPOINT) {
         this.sidenav.mode = 'over';
+        // Monitor opening and closing events when in 'over' mode
+        this.setupSidenavEventListeners();
       }
       if (window.innerWidth >= this.SMALL_SCREEN_BREAKPOINT) {
         this.sidenav.mode = 'side';
@@ -65,8 +69,22 @@ export class SidenavComponent implements OnInit, OnDestroy {
       }
       if (this.sidenav && this.sidenav.opened) {
         this.sidenav.close();
+        this.sidenavService.notifyStateChange(false);
       }
     });
+  }
+
+  private setupSidenavEventListeners() {
+    if (this.sidenav) {
+      // Use afterOpen and afterClose events to keep icon state in sync
+      this.sidenav.openedStart.subscribe(() => {
+        this.sidenavService.notifyStateChange(true);
+      });
+
+      this.sidenav.closedStart.subscribe(() => {
+        this.sidenavService.notifyStateChange(false);
+      });
+    }
   }
 
   ngOnDestroy() {
