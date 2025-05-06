@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 import { join } from 'path';
 import { RmqOptions, Transport } from '@nestjs/microservices';
 
+const rabbitMQEnabled = process.env.RABBITMQ_ENABLED !== 'false';
 const envFile =
   process.env.NODE_ENV === 'production'
     ? '.env.production'
@@ -36,25 +37,27 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('', app, documentFactory);
 
-  app.connectMicroservice<RmqOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: [`amqp://${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
-      queue: 'receivables_queue',
-      prefetchCount: 1,
-      persistent: true,
-      noAck: false,
-      queueOptions: {
-        durable: true,
+  if (rabbitMQEnabled) {
+    app.connectMicroservice<RmqOptions>({
+      transport: Transport.RMQ,
+      options: {
+        urls: [`amqp://${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
+        queue: 'receivables_queue',
+        prefetchCount: 1,
+        persistent: true,
+        noAck: false,
+        queueOptions: {
+          durable: true,
+        },
+        socketOptions: {
+          heartbeatIntervalInSeconds: 60,
+          reconnectTimeInSeconds: 5,
+        },
       },
-      socketOptions: {
-        heartbeatIntervalInSeconds: 60,
-        reconnectTimeInSeconds: 5,
-      },
-    },
-  });
+    });
 
-  await app.startAllMicroservices();
+    await app.startAllMicroservices();
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 
