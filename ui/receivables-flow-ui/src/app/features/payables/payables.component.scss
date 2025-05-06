@@ -10,6 +10,7 @@
 
   &__header {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
@@ -21,8 +22,12 @@
 
   &__actions {
     display: flex;
-    justify-content: space-between;
-    width: 320px;
+    justify-content: flex-end;
+    width: 100%;
+
+    > button {
+      margin-left: 1rem;
+    }
   }
 
   &__button {
