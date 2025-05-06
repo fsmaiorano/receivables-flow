@@ -1,1 +1,124 @@
-<p>upload-payable works!</p>
+<section class="upload-payable">
+  <div class="upload-payable-header">
+    <h2>Upload Payables</h2>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="false">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="upload-payable-content">
+    <p class="instructions">
+      Upload a CSV file containing payable data. The file must include columns
+      for
+      <strong>value</strong>, <strong>assignorId</strong>, and optionally
+      <strong>emissionDate</strong>.
+    </p>
+
+    <!-- File Drop Zone -->
+    <div
+      class="upload-drop-zone"
+      [class.active]="isDragging"
+      [class.has-file]="selectedFile"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (click)="!selectedFile && browseFiles()"
+    >
+      <input
+        type="file"
+        #fileInput
+        hidden
+        accept=".csv"
+        (change)="onFileSelected($event)"
+      />
+
+      <ng-container *ngIf="!selectedFile">
+        <mat-icon class="upload-icon">cloud_upload</mat-icon>
+        <p class="upload-text">Drag and drop your CSV file here</p>
+        <p class="upload-subtext">or</p>
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          class="browse-button"
+          (click)="browseFiles(); $event.stopPropagation()"
+        >
+          Browse Files
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="selectedFile">
+        <div class="selected-file">
+          <mat-icon class="file-icon">description</mat-icon>
+          <span class="file-name">{{ selectedFile.name }}</span>
+          <span class="file-size"
+            >{{ (selectedFile.size / 1024).toFixed(2) }} KB</span
+          >
+          <button
+            mat-icon-button
+            class="remove-file-button"
+            (click)="removeFile(); $event.stopPropagation()"
+            [disabled]="isLoading"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      <mat-icon color="warn">error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="upload-progress" *ngIf="isLoading || isUploaded">
+      <mat-progress-bar
+        [mode]="isLoading ? 'determinate' : 'determinate'"
+        [value]="uploadProgress"
+        [color]="isUploaded ? 'accent' : 'primary'"
+      ></mat-progress-bar>
+      <p class="progress-text">
+        {{
+          isUploaded
+            ? 'Upload complete!'
+            : 'Uploading... ' + uploadProgress + '%'
+        }}
+      </p>
+    </div>
+
+    <!-- Sample Format -->
+    <div class="sample-format">
+      <h3>Sample CSV Format</h3>
+      <pre>
+value,assignorId,emissionDate
+5000.75,98b730b7-8848-45d6-b89c-b95e62a8b889,2025-05-06T15:33:28.902Z
+1250.22,7ed7978d-f53f-4c35-8217-8dd6732251ee,2025-05-06T15:33:28.903Z</pre
+      >
+    </div>
+  </div>
+
+  <div class="upload-payable-actions">
+    <button
+      mat-button
+      type="button"
+      [mat-dialog-close]="false"
+      class="cancel-btn"
+      [disabled]="isLoading"
+    >
+      Cancel
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      class="upload-btn"
+      [disabled]="!selectedFile || isLoading || isUploaded"
+      (click)="uploadFile()"
+    >
+      <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+      <span *ngIf="!isLoading">{{ isUploaded ? 'Uploaded' : 'Upload' }}</span>
+    </button>
+  </div>
+</section>

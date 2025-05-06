@@ -23,6 +23,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {
   provideHttpClient,
   withInterceptorsFromDi,
@@ -55,6 +56,7 @@ import {
     MatPaginatorModule,
     MatDatepickerModule,
     MatAutocompleteModule,
+    MatProgressBarModule,
   ],
   exports: [
     CommonModule,
@@ -81,6 +83,7 @@ import {
     MatPaginatorModule,
     MatDatepickerModule,
     MatAutocompleteModule,
+    MatProgressBarModule,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi())],
 })
