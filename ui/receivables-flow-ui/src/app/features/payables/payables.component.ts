@@ -13,6 +13,7 @@ import { PaginatedResponseDto } from '../core/dto/pagination.response';
 import { Result } from '../core/dto/result.generic';
 import { PayableResponse } from '../core/data/http/payable/dto/payable.response';
 import { DetailPayableComponent } from './detail-payable/detail-payable.component';
+import { UploadPayableComponent } from './upload-payable/upload-payable.component';
 
 interface Payable {
   id: string;
@@ -192,6 +193,21 @@ export class PayablesComponent implements OnInit, AfterViewInit {
       maxWidth: '90vw',
       autoFocus: false,
       data: payable,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.loadPayables();
+      }
+    });
+  }
+
+  openImportPayablesDialog() {
+    const dialogRef = this.dialog.open(UploadPayableComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      autoFocus: false,
+      data: null,
     });
 
     dialogRef.afterClosed().subscribe((result) => {
