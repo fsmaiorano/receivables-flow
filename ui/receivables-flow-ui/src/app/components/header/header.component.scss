@@ -16,6 +16,12 @@
     min-width: auto;
     padding: 0 8px;
   }
+  .menu-icon {
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+  }
 
   > button {
     width: 90px;
