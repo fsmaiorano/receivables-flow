@@ -49,13 +49,14 @@ export class AuthComponent {
             userId: response.data!.userId,
           });
 
-          this.router.navigate(['/dashboard']);
+          this.router.initialNavigation();
         });
     } catch (error) {
       console.error('Sign-in failed', error);
     } finally {
       this.authFormGroup.reset();
       this.isLoading.set(false);
+      this.router.navigate(['/dashboard']);
     }
   }
 
