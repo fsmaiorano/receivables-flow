@@ -23,6 +23,11 @@ export class PayableService {
     @InjectRepository(Payable)
     private readonly payableRepository: Repository<Payable>,
     @Inject('ReceivablesFlow') private client: ClientProxy,
+    @Inject('ReceivablesFlowRetry1') private clientRetry1: ClientProxy,
+    @Inject('ReceivablesFlowRetry2') private clientRetry2: ClientProxy,
+    @Inject('ReceivablesFlowRetry3') private clientRetry3: ClientProxy,
+    @Inject('ReceivablesFlowRetry4') private clientRetry4: ClientProxy,
+    @Inject('ReceivablesFlowDeadLetter') private clientDeadLetter: ClientProxy,
     private readonly correlationIdService: CorrelationIdService,
   ) {}
 
@@ -229,7 +234,9 @@ export class PayableService {
       const batch = createPayableBatchRequest.payables.slice(i, i + batchSize);
 
       try {
-        await this.sendToQueue(batch);
+        // Send to main queue first
+        const queueResult = await this.sendToQueue(batch);
+        results.push(queueResult);
       } catch (sendError) {
         console.error('Error sending batch notification:', {
           error: sendError.message,
@@ -247,6 +254,7 @@ export class PayableService {
    */
   private async sendToQueue(
     payableBatchRequest: CreatePayableRequest[],
+    retryCount = 0,
   ): Promise<any> {
     const correlationId = this.correlationIdService.getCorrelationId();
     const messageId = crypto.randomUUID();
@@ -257,20 +265,22 @@ export class PayableService {
           ['x-version']: '1.0.0',
           ['x-correlation-id']: correlationId,
           ['x-message-id']: messageId,
+          ['x-retry-count']: retryCount.toString(),
         },
         priority: 3,
         messageId: messageId,
       })
       .build();
 
+    const client = this.getClientByRetryCount(retryCount);
+    const queueName = this.getQueueNameByRetryCount(retryCount);
+
     try {
       console.log(
-        `Sending batch of ${payableBatchRequest.length} items with correlation ID: ${correlationId}`,
+        `Sending batch of ${payableBatchRequest.length} items to ${queueName} with correlation ID: ${correlationId}`,
       );
-      const response = await firstValueFrom(
-        this.client.send('payable', record),
-      );
-      console.log('Batch notification sent successfully', {
+      const response = await firstValueFrom(client.send('payable', record));
+      console.log(`Batch notification sent successfully to ${queueName}`, {
         correlationId,
         messageId,
         response,
@@ -282,17 +292,86 @@ export class PayableService {
         messageId,
       };
     } catch (error) {
-      console.error('Error sending batch notification:', {
+      console.error(`Error sending batch notification to ${queueName}:`, {
         error: error.message,
         stack: error.stack,
         correlationId,
         timestamp: new Date().toISOString(),
         batchSize: payableBatchRequest.length,
-        connectionState: this.client?.status ? 'connected' : 'disconnected',
+        connectionState: client?.status ? 'connected' : 'disconnected',
       });
       throw new Error(
-        `Failed to send batch notification: ${error.message}. Correlation ID: ${correlationId}`,
+        `Failed to send batch notification to ${queueName}: ${error.message}. Correlation ID: ${correlationId}`,
       );
     }
+  }
+
+  /**
+   * Get the appropriate client based on retry count
+   * @param retryCount Current retry attempt
+   * @returns The appropriate ClientProxy
+   */
+  private getClientByRetryCount(retryCount: number): ClientProxy {
+    switch (retryCount) {
+      case 0:
+        return this.client;
+      case 1:
+        return this.clientRetry1;
+      case 2:
+        return this.clientRetry2;
+      case 3:
+        return this.clientRetry3;
+      case 4:
+        return this.clientRetry4;
+      default:
+        return this.clientDeadLetter;
+    }
+  }
+
+  /**
+   * Get queue name based on retry count
+   * @param retryCount Current retry attempt
+   * @returns Queue name
+   */
+  private getQueueNameByRetryCount(retryCount: number): string {
+    switch (retryCount) {
+      case 0:
+        return 'receivables_queue';
+      case 1:
+        return 'receivables_queue_retry_1';
+      case 2:
+        return 'receivables_queue_retry_2';
+      case 3:
+        return 'receivables_queue_retry_3';
+      case 4:
+        return 'receivables_queue_retry_4';
+      default:
+        return 'receivables_queue_dead_letter';
+    }
+  }
+
+  /**
+   * Move a failed payable request to the next retry queue
+   * @param payableBatchRequest Payable request to retry
+   * @param retryCount Current retry count
+   * @returns Response from the message broker
+   */
+  async retryPayable(
+    payableBatchRequest: CreatePayableRequest[],
+    retryCount: number,
+  ): Promise<any> {
+    const nextRetryCount = retryCount + 1;
+
+    // If we've exceeded the maximum retry count, send to dead letter queue
+    if (nextRetryCount > 4) {
+      console.log(`Max retry count reached, sending to dead letter queue`, {
+        payableBatchRequest,
+        retryCount,
+      });
+      return this.sendToQueue(payableBatchRequest, nextRetryCount);
+    }
+
+    // Otherwise, send to the next retry queue
+    return this.sendToQueue(payableBatchRequest, nextRetryCount);
   }
 }

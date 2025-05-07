@@ -22,7 +22,7 @@
     "migration:generate": "read -p 'Enter migration name: ' name && pnpm typeorm migration:generate src/shared/database/migrations/$name",
     "migration:run": "pnpm typeorm migration:run",
     "migration:revert": "pnpm typeorm migration:revert",
-    "seed": "ts-node seed/seed.ts"
+    "seed": "pnpm migration:run && ts-node seed/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
