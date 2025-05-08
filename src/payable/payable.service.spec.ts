@@ -2,12 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PayableService } from './payable.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Payable } from './domain/entities/payable.entity';
-import { Repository } from 'typeorm';
 import { AssignorService } from '../assignor/assignor.service';
+import { ClientProxy } from '@nestjs/microservices';
+import { CorrelationIdService } from '../shared/services/correlation-id.service';
 
 describe('PayableService', () => {
   let service: PayableService;
-  let repository: Repository<Payable>;
 
   const mockRepository = {
     findOne: jest.fn(),
@@ -17,6 +17,10 @@ describe('PayableService', () => {
 
   const mockAssignorService = {
     verifyExists: jest.fn(),
+  };
+
+  const mockCorrelationIdService = {
+    getCorrelationId: jest.fn().mockReturnValue('test-correlation-id'),
   };
 
   beforeEach(async () => {
@@ -31,11 +35,25 @@ describe('PayableService', () => {
           provide: AssignorService,
           useValue: mockAssignorService,
         },
+        {
+          provide: ClientProxy,
+          useValue: {
+            emit: jest.fn(),
+            send: jest.fn().mockReturnValue({
+              pipe: jest.fn().mockReturnValue({
+                toPromise: jest.fn().mockResolvedValue({}),
+              }),
+            }),
+          },
+        },
+        {
+          provide: CorrelationIdService,
+          useValue: mockCorrelationIdService,
+        },
       ],
     }).compile();
 
     service = module.get<PayableService>(PayableService);
-    repository = module.get<Repository<Payable>>(getRepositoryToken(Payable));
   });
 
   it('should be defined', () => {

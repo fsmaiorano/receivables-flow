@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PayableController } from './payable.controller';
 import { PayableService } from './payable.service';
+import { DeduplicationService } from '../shared/services/deduplication.service';
 
 describe('PayableController', () => {
   let controller: PayableController;
@@ -21,6 +22,15 @@ describe('PayableController', () => {
         {
           provide: PayableService,
           useValue: mockPayableService,
+        },
+        {
+          provide: DeduplicationService,
+          useValue: {
+            isProcessed: jest.fn(),
+            markAsProcessed: jest.fn(),
+            cleanupExpiredEntries: jest.fn(),
+            getCacheSize: jest.fn(),
+          },
         },
       ],
     }).compile();

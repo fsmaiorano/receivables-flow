@@ -3,7 +3,12 @@ import { CreateAssignorResponse } from './dtos/create-assignor.response';
 import { CreateAssignorRequest } from './dtos/create-assignor.request';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
+import { Result } from 'src/shared/dto/result.generic';
+import { HttpStatusCode } from 'axios';
+import { GetAssignorResponse } from './dtos/get-assignor.response';
+import { PaginatedResponseDto } from 'src/shared/dto/pagination.response';
+import { PaginationRequestDto } from 'src/shared/dto/pagination.request';
 
 export interface VerifyExistsParams {
   assignorId?: string;
@@ -16,12 +21,6 @@ export class AssignorService {
     @InjectRepository(Assignor)
     private assignorRepository: Repository<Assignor>,
   ) {}
-
-  async getAssignorById(assignorId: string): Promise<Assignor | null> {
-    return this.assignorRepository.findOne({
-      where: { id: assignorId },
-    });
-  }
 
   async verifyExists({
     assignorId,
@@ -42,19 +41,130 @@ export class AssignorService {
     return false;
   }
 
+  async getAssignorById(assignorId: string): Promise<Assignor | null> {
+    return this.assignorRepository.findOne({
+      where: { id: assignorId },
+    });
+  }
+
   async createAssignor(
     request: CreateAssignorRequest,
-  ): Promise<CreateAssignorResponse> {
+  ): Promise<Result<CreateAssignorResponse>> {
     const assignorExists = await this.verifyExists({
       assignorEmail: request.email,
     });
 
-    if (assignorExists) {
-      throw new Error('Assignor already exists');
+    try {
+      if (assignorExists) {
+        throw new Error('Assignor already exists');
+      }
+
+      const newAssignor = this.assignorRepository.create(request);
+      const assignor = await this.assignorRepository.save(newAssignor);
+
+      return Result.success<CreateAssignorResponse>(
+        {
+          id: assignor.id,
+        },
+        HttpStatusCode.Ok,
+      );
+    } catch (error) {
+      return Result.failure<CreateAssignorResponse>(
+        error.message,
+        HttpStatusCode.BadRequest,
+      );
+    }
+  }
+
+  async updateAssignor(
+    id: string,
+    request: CreateAssignorRequest,
+  ): Promise<Result<CreateAssignorResponse>> {
+    const assignor = await this.getAssignorById(id);
+    if (!assignor) {
+      throw new Error('Assignor not found');
     }
 
-    const newAssignor = this.assignorRepository.create(request);
-    const assignor = await this.assignorRepository.save(newAssignor);
-    return assignor;
+    Object.assign(assignor, request);
+    const updatedAssignor = await this.assignorRepository.save(assignor);
+
+    return Result.success<CreateAssignorResponse>(
+      {
+        id: updatedAssignor.id,
+      },
+      HttpStatusCode.Ok,
+    );
+  }
+
+  async deleteAssignor(id: string): Promise<Result<void>> {
+    const assignor = await this.getAssignorById(id);
+    if (!assignor) {
+      throw new Error('Assignor not found');
+    }
+
+    await this.assignorRepository.remove(assignor);
+
+    return Result.success<void>(undefined, HttpStatusCode.Ok);
+  }
+
+  async getAllAssignors(
+    paginationOptions?: PaginationRequestDto,
+    filter?: string,
+  ): Promise<Result<PaginatedResponseDto<GetAssignorResponse>>> {
+    try {
+      const page = Math.max(0, paginationOptions?.page ?? 0);
+      const pageSize = Math.max(1, paginationOptions?.pageSize ?? 10);
+
+      const skip = page * pageSize;
+
+      let whereClause = {};
+      if (filter) {
+        whereClause = [
+          { name: Like(`%${filter}%`) },
+          { email: Like(`%${filter}%`) },
+          { document: Like(`%${filter}%`) },
+        ];
+      }
+
+      console.log(
+        `Backend query: page=${page}, pageSize=${pageSize}, skip=${skip}`,
+      );
+
+      const [assignors, totalCount] =
+        await this.assignorRepository.findAndCount({
+          where: whereClause,
+          skip: skip,
+          take: pageSize,
+          order: {
+            createdAt: 'DESC',
+          },
+        });
+
+      const assignorResponses: GetAssignorResponse[] = assignors.map(
+        (assignor) => ({
+          id: assignor.id,
+          document: assignor.document,
+          email: assignor.email,
+          phone: assignor.phone,
+          name: assignor.name,
+          createdAt: assignor.createdAt,
+          updatedAt: assignor.updatedAt,
+        }),
+      );
+
+      const paginatedResponse = PaginatedResponseDto.create(
+        assignorResponses,
+        totalCount,
+        page,
+        pageSize,
+      );
+
+      return Result.success(paginatedResponse, HttpStatusCode.Ok);
+    } catch (error) {
+      return Result.failure(
+        error.message || 'Failed to retrieve assignors',
+        HttpStatusCode.InternalServerError,
+      );
+    }
   }
 }

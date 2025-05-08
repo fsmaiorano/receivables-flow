@@ -1,0 +1,51 @@
+<section class="auth">
+  <mat-card class="container" elevation="4">
+    <form class="form" [formGroup]="authFormGroup" (ngSubmit)="onSubmit()">
+      <mat-card-title>Receivables</mat-card-title>
+      <mat-form-field appearance="outline">
+        <mat-label>Username</mat-label>
+        <input
+          matInput
+          formControlName="username"
+          placeholder="Enter your username"
+        />
+        <mat-error
+          *ngIf="
+            authFormGroup.get('username')?.invalid &&
+            (authFormGroup.get('username')?.dirty ||
+              authFormGroup.get('username')?.touched)
+          "
+        >
+          Please enter a valid username.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          formControlName="password"
+          type="password"
+          placeholder="Enter your password"
+        />
+        <mat-error
+          *ngIf="
+            authFormGroup.get('password')?.invalid &&
+            (authFormGroup.get('password')?.dirty ||
+              authFormGroup.get('password')?.touched)
+          "
+        >
+          Please enter a valid password.
+        </mat-error>
+      </mat-form-field>
+
+      <ng-container *ngIf="!isLoading(); else loadingTemplate">
+        <button mat-raised-button color="primary" type="submit">Sign In</button>
+        <!-- <button mat-button color="primary" type="button" (click)="goToSignUp()">
+        Sign Up
+      </button> -->
+      </ng-container>
+      <ng-template #loadingTemplate> <mat-spinner></mat-spinner></ng-template>
+    </form>
+  </mat-card>
+</section>

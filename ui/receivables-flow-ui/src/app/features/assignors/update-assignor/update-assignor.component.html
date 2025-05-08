@@ -1,0 +1,97 @@
+<section class="update-assignor">
+  <!-- Header with title and close button -->
+  <div class="update-assignor-header">
+    <h2>Update Assignor</h2>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="false">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Form with styled fields -->
+  <form
+    [formGroup]="assignorForm"
+    (ngSubmit)="onSubmit()"
+    class="update-assignor-form"
+  >
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Name</mat-label>
+      <input
+        matInput
+        formControlName="name"
+        required
+        placeholder="Enter assignor name"
+      />
+      <mat-icon matSuffix>person</mat-icon>
+      <mat-error *ngIf="(f['name'].touched || submitted) && f['name'].errors">
+        {{ getErrorMessage('name') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Email</mat-label>
+      <input
+        matInput
+        formControlName="email"
+        required
+        placeholder="Enter assignor email"
+      />
+      <mat-icon matSuffix>email</mat-icon>
+      <mat-error *ngIf="(f['email'].touched || submitted) && f['email'].errors">
+        {{ getErrorMessage('email') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Phone</mat-label>
+      <input
+        matInput
+        formControlName="phone"
+        required
+        placeholder="Enter assignor phone"
+      />
+      <mat-icon matSuffix>phone</mat-icon>
+      <mat-error *ngIf="(f['phone'].touched || submitted) && f['phone'].errors">
+        {{ getErrorMessage('phone') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Document</mat-label>
+      <input
+        matInput
+        formControlName="document"
+        required
+        placeholder="Enter assignor document"
+      />
+      <mat-icon matSuffix>description</mat-icon>
+      <mat-error
+        *ngIf="(f['document'].touched || submitted) && f['document'].errors"
+      >
+        {{ getErrorMessage('document') }}
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Action buttons at the bottom -->
+    <div class="update-assignor-actions">
+      <button
+        mat-button
+        type="button"
+        [mat-dialog-close]="false"
+        class="cancel-btn"
+        [disabled]="loading"
+      >
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="loading"
+        class="save-btn"
+      >
+        <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+        <span *ngIf="!loading">Save Changes</span>
+      </button>
+    </div>
+  </form>
+</section>

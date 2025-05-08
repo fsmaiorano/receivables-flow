@@ -28,11 +28,4 @@ export class CreateUserRequest {
     type: String,
   })
   password: string;
-
-  @ApiProperty({
-    description: 'The confirm password of the user',
-    example: 'password123',
-    type: String,
-  })
-  confirmPassword: string;
 }

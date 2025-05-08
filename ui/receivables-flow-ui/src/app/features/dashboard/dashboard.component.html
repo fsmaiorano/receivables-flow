@@ -1,0 +1,182 @@
+<section class="dashboard">
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <div class="dashboard-content" *ngIf="!isLoading">
+    <app-breadcrumb></app-breadcrumb>
+
+    <div class="dashboard-header">
+      <h1>Dashboard</h1>
+      <p class="dashboard-subtitle">
+        Welcome to Receivables Flow management system
+      </p>
+    </div>
+
+    <div class="stats-cards">
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-icon blue">
+            <mat-icon>description</mat-icon>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ totalPayables | number }}</div>
+            <div class="stat-label">Total Payables</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-icon green">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ totalAssignors | number }}</div>
+            <div class="stat-label">Total Assignors</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-icon amber">
+            <mat-icon>monetization_on</mat-icon>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ totalAmount | currency }}</div>
+            <div class="stat-label">Total Amount</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-icon purple">
+            <mat-icon>update</mat-icon>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ recentActivity }}</div>
+            <div class="stat-label">Recent Activities</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Charts section -->
+    <div class="chart-container">
+      <!-- Monthly Payables Chart -->
+      <mat-card class="chart-card" appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Monthly Payables</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="monthly-chart">
+            <div class="chart-bars">
+              <ng-container *ngFor="let item of monthlyPayables; let i = index">
+                <div class="chart-bar-container">
+                  <div class="chart-value">{{ item.amount | currency }}</div>
+                  <div
+                    class="chart-bar"
+                    [ngClass]="{ 'has-value': item.amount > 0 }"
+                    [ngStyle]="{
+                      height:
+                        (item.amount > 0
+                          ? calculateBarHeight(item.amount)
+                          : '2') + 'px',
+                      'background-color': chartColors[i % chartColors.length],
+                    }"
+                  ></div>
+                  <div class="chart-label">{{ item.month }}</div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Assignor Distribution Chart -->
+      <mat-card class="chart-card" appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Top Assignors</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="assignor-chart">
+            <div class="pie-container">
+              <div class="pie-placeholder">
+                <div class="no-data" *ngIf="assignorDistribution.length === 0">
+                  <mat-icon>bar_chart_off</mat-icon>
+                  <p>No data available</p>
+                </div>
+                <!-- Placeholder for future pie chart -->
+                <div class="pie-chart" *ngIf="assignorDistribution.length > 0">
+                  <div class="pie-segments">
+                    <div
+                      *ngFor="let item of assignorDistribution; let i = index"
+                      class="pie-segment"
+                      [style.background-color]="
+                        chartColors[i % chartColors.length]
+                      "
+                      [style.transform]="'rotate(' + i * 72 + 'deg)'"
+                      [style.clip-path]="
+                        'polygon(50% 50%, 50% 0%, ' +
+                        (50 + 50 * Math.sin(((i + 1) * 72 * Math.PI) / 180)) +
+                        '% ' +
+                        (50 - 50 * Math.cos(((i + 1) * 72 * Math.PI) / 180)) +
+                        '%, 50% 50%)'
+                      "
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="assignor-list">
+              <div
+                class="assignor-item"
+                *ngFor="let item of assignorDistribution; let i = index"
+              >
+                <div
+                  class="assignor-color"
+                  [style.background-color]="chartColors[i % chartColors.length]"
+                ></div>
+                <div class="assignor-name">{{ item.name }}</div>
+                <div class="assignor-count">{{ item.count }} payables</div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick Actions -->
+    <mat-card class="actions-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Quick Actions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="quick-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            [routerLink]="['/payables']"
+          >
+            <mat-icon>payment</mat-icon>
+            <span class="button-text">Manage Payables</span>
+          </button>
+          <button
+            mat-raised-button
+            color="accent"
+            [routerLink]="['/assignors']"
+          >
+            <mat-icon>business</mat-icon>
+            <span class="button-text">Manage Assignors</span>
+          </button>
+          <button mat-raised-button color="warn" [routerLink]="['/reports']">
+            <mat-icon>cloud_download</mat-icon>
+            <span class="button-text">Export Report</span>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

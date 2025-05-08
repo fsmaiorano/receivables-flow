@@ -1,0 +1,106 @@
+<section class="payables">
+  <!-- Add breadcrumbs above the title -->
+  <app-breadcrumb></app-breadcrumb>
+
+  <div class="payables__header">
+    <h1 class="payables__title">Payables</h1>
+    <div class="payables__actions">
+      <button
+        mat-raised-button
+        color="primary"
+        class="payables__button"
+        (click)="openCreatePayableDialog()"
+      >
+        <mat-icon>add</mat-icon>
+        Add Payable
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        class="payables__button"
+        (click)="openImportPayablesDialog()"
+      >
+        <mat-icon>upload</mat-icon>
+        Import Payables
+      </button>
+    </div>
+  </div>
+
+  <div class="payables__filter">
+    <mat-form-field appearance="outline" class="payables__filter-field">
+      <mat-label>Filter</mat-label>
+      <input
+        matInput
+        placeholder="Search by value or date"
+        [formControl]="filterControl"
+      />
+      <button
+        *ngIf="filterControl.value"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="clearFilter()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+      <mat-icon matSuffix *ngIf="!filterControl.value">search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <mat-table [dataSource]="payables" class="payables__table mat-elevation-z8">
+    <ng-container matColumnDef="value">
+      <mat-header-cell *matHeaderCellDef> Value </mat-header-cell>
+      <mat-cell *matCellDef="let payable">
+        {{ payable.value | currency }}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="emissionDate">
+      <mat-header-cell *matHeaderCellDef> Emission Date </mat-header-cell>
+      <mat-cell *matCellDef="let payable">
+        {{ payable.emissionDate | date: 'medium' }}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+      <mat-cell *matCellDef="let payable">
+        <button mat-icon-button (click)="openDetailPayableDialog(payable)">
+          <mat-icon>search</mat-icon>
+        </button>
+        <button mat-icon-button (click)="openEditPayableDialog(payable)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="deletePayable(payable.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+
+    <!-- No data message -->
+    <tr class="mat-row" *matNoDataRow>
+      <td
+        class="mat-cell payables__no-data-cell"
+        [attr.colspan]="displayedColumns.length"
+      >
+        No payables found matching your filter criteria
+      </td>
+    </tr>
+  </mat-table>
+
+  <!-- Pagination -->
+  <div class="payables__pagination">
+    <mat-paginator
+      [length]="totalItems"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      [pageSizeOptions]="pageSizeOptions"
+      [showFirstLastButtons]="true"
+      [hidePageSize]="false"
+      aria-label="Select page of payables"
+    ></mat-paginator>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+<section class="detail-payable">
+  <div class="detail-payable-header">
+    <h2>Payable Details</h2>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="false">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="detail-payable-content">
+    <p><strong>Value:</strong> {{ payable.value | currency }}</p>
+    <p>
+      <strong>Emission Date:</strong>
+      {{ payable.emissionDate | date: 'medium' }}
+    </p>
+    <p><strong>Assignor:</strong> {{ payable.assignor?.name }}</p>
+  </div>
+
+  <div class="detail-payable-actions"></div>
+</section>

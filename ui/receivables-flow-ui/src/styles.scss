@@ -1,0 +1,27 @@
+@use '@angular/material' as mat;
+
+@use './app/themes/default.theme.scss' as defaultTheme;
+@use './app/themes/default.typography.scss';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+html {
+  background-color: #f0f0f0;
+}

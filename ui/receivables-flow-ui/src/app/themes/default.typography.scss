@@ -1,0 +1,160 @@
+// Variables
+$primary-font: 'Roboto', sans-serif;
+$secondary-font: 'Roboto', sans-serif;
+$base-color: #333;
+
+// Base font size responsive adjustment
+html {
+  font-size: clamp(16px, 1vw, 20px);
+}
+
+body {
+  font-family: $primary-font;
+  font-size: clamp(1rem, 1vw + 0.2rem, 1.2rem);
+  line-height: 1.6;
+  color: $base-color;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+// Headings with responsive sizes
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $secondary-font;
+  margin-top: 0;
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 3vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: clamp(2rem, 2.5vw, 2.5rem);
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: clamp(1.75rem, 2vw, 2.25rem);
+}
+
+h4 {
+  font-size: clamp(1.5rem, 1.5vw, 2rem);
+}
+
+h5 {
+  font-size: clamp(1.25rem, 1.2vw, 1.75rem);
+}
+
+h6 {
+  font-size: clamp(1.1rem, 1vw, 1.5rem);
+}
+
+// Paragraph and text elements
+p {
+  font-size: clamp(1rem, 0.8vw + 0.2rem, 1.2rem);
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
+  max-width: 70ch; // Optimal reading length
+}
+
+a {
+  color: #1976d2;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-size: inherit;
+
+  &:hover {
+    color: #0d47a1;
+    text-decoration: underline;
+  }
+}
+
+// Lists
+ul,
+ol {
+  font-size: clamp(1rem, 0.8vw + 0.2rem, 1.2rem);
+  margin: clamp(1rem, 1.5vw, 1.5rem) 0;
+  padding-left: clamp(1.5rem, 2vw, 2rem);
+}
+
+li {
+  margin-bottom: clamp(0.5rem, 0.5vw, 0.75rem);
+}
+
+// Quote blocks
+blockquote {
+  font-size: clamp(1rem, 0.9vw + 0.2rem, 1.2rem);
+  margin: clamp(1.5rem, 2vw, 2rem) 0;
+  padding-left: clamp(1.5rem, 2vw, 2rem);
+  border-left: 4px solid #ccc;
+  font-style: italic;
+  color: #555;
+}
+
+// Code elements
+code {
+  font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-size: clamp(0.9rem, 0.8vw + 0.1rem, 1.1rem);
+  background-color: #f4f4f4;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
+pre {
+  font-size: clamp(0.9rem, 0.8vw + 0.1rem, 1.1rem);
+  padding: clamp(1rem, 1.5vw, 1.5rem);
+  border-radius: 3px;
+  overflow-x: auto;
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
+}
+
+// Tables
+table {
+  font-size: clamp(1rem, 0.8vw + 0.2rem, 1.2rem);
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: clamp(1.5rem, 2vw, 2rem);
+
+  th,
+  td {
+    padding: clamp(0.75rem, 1vw, 1rem);
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    font-weight: 600;
+  }
+}
+
+// Small text and details
+small {
+  font-size: clamp(0.875rem, 0.7vw + 0.1rem, 1rem);
+}
+
+// Material specific components
+mat-card-title {
+  font-size: clamp(1.25rem, 1.2vw, 1.75rem);
+  font-weight: bold;
+}
+
+// Media Queries for larger screens
+@media screen and (min-width: 2560px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+@media screen and (min-width: 3840px) {
+  html {
+    font-size: 20px;
+  }
+}
