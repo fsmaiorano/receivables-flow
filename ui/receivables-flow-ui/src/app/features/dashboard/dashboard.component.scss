@@ -23,15 +23,13 @@
 
 .dashboard-content {
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
 }
 
 .dashboard-header {
   margin-bottom: 2rem;
 
   h1 {
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 5vw, 2rem);
     font-weight: 500;
     margin-bottom: 0.5rem;
     color: #333;
@@ -39,14 +37,14 @@
 
   .dashboard-subtitle {
     color: #666;
-    font-size: 1rem;
+    font-size: clamp(0.875rem, 4vw, 1rem);
   }
 }
 
 // Stats Cards
 .stats-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -122,15 +120,16 @@
 // Charts Section
 .chart-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   margin-bottom: 2rem;
+  height: calc(100vh - 350px);
+  min-height: 300px;
 }
 
 .chart-card {
   border-radius: 12px;
   height: 100%;
-  min-height: 300px;
 
   mat-card-header {
     padding: 1rem 1rem 0;
@@ -150,10 +149,6 @@
 }
 
 // Monthly Chart Styling
-.chart-placeholder.monthly-chart {
-  height: 100%;
-}
-
 .monthly-chart {
   height: 100%;
   display: flex;
@@ -218,6 +213,7 @@
 .assignor-chart {
   display: flex;
   height: 100%;
+  flex-direction: row;
 }
 
 .pie-container {
@@ -236,6 +232,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+.pie-chart {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  .pie-segments {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .pie-segment {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 50%;
+  }
 }
 
 .no-data {
@@ -280,6 +296,7 @@
   height: 16px;
   border-radius: 4px;
   margin-right: 12px;
+  flex-shrink: 0;
 }
 
 .assignor-name {
@@ -294,6 +311,8 @@
 .assignor-count {
   font-size: 0.8rem;
   color: #666;
+  padding-left: 8px;
+  white-space: nowrap;
 }
 
 // Quick Actions
@@ -316,13 +335,15 @@
   gap: 1rem;
 
   button {
+    flex: 1;
+    min-width: 150px;
+
     mat-icon {
       margin-right: 8px;
     }
   }
 }
 
-// Floating Action Button
 .add-button {
   position: fixed;
   right: 2rem;
@@ -330,20 +351,73 @@
   z-index: 1000;
 }
 
-// Responsive adjustments
-@media (max-width: 960px) {
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 1400px) {
   .chart-container {
-    grid-template-columns: 1fr;
+    height: auto;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1200px) {
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .chart-container {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions button {
+    flex-basis: calc(50% - 1rem);
+  }
+}
+
+@media (max-width: 768px) {
   .dashboard {
     padding: 1rem;
   }
 
   .stats-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .stat-details .stat-value {
+    font-size: 1.4rem;
+  }
+
+  .chart-bars {
+    height: 180px;
+  }
+
+  .chart-value {
+    font-size: 0.7rem;
+  }
+
+  .chart-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .assignor-chart {
@@ -365,5 +439,44 @@
     button {
       width: 100%;
     }
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  .assignor-item {
+    padding: 12px 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-bars {
+    height: 150px;
+  }
+
+  .stat-details .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .chart-card {
+    min-height: 250px;
+  }
+
+  .dashboard-header h1 {
+    margin-bottom: 0.25rem;
+  }
+
+  .chart-label {
+    max-width: 60px;
+    font-size: 0.65rem;
+  }
+
+  .button-text {
+    font-size: 0.9rem;
   }
 }

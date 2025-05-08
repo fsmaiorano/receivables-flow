@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  HostListener,
   OnInit,
   inject,
 } from '@angular/core';
@@ -12,19 +13,6 @@ import { PayableService } from '../core/data/http/payable/payable.service';
 import { AssignorService } from '../core/data/http/assignor/assignor.service';
 import { forkJoin, catchError, of } from 'rxjs';
 import { MaxPipe } from '../../shared/pipes/max.pipe';
-
-// Adding interfaces to fix type issues
-interface Payable {
-  id: string;
-  value: number | string;
-  emissionDate: string;
-  assignorId: string;
-}
-
-interface Assignor {
-  id: string;
-  name: string;
-}
 
 @Component({
   selector: 'app-dashboard',
@@ -39,6 +27,11 @@ export class DashboardComponent implements OnInit {
   private payableService = inject(PayableService);
   private assignorService = inject(AssignorService);
   private cdr = inject(ChangeDetectorRef);
+
+  protected Math = Math;
+
+  screenWidth = window.innerWidth;
+  isMobile = window.innerWidth < 768;
 
   // Dashboard statistics
   totalPayables = 0;
@@ -64,6 +57,13 @@ export class DashboardComponent implements OnInit {
     '#039BE5',
     '#0B8043',
   ];
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.screenWidth = event.target.innerWidth;
+    this.isMobile = this.screenWidth < 768;
+    this.cdr.detectChanges();
+  }
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -192,7 +192,7 @@ export class DashboardComponent implements OnInit {
     // Populate with actual data
     payables.forEach((payable) => {
       if (!payable.emissionDate) {
-        return; // Skip if no date available
+        return;
       }
 
       try {
@@ -291,17 +291,11 @@ export class DashboardComponent implements OnInit {
     return percentage > 0 ? minHeight : 0;
   }
 
-  /**
-   * Calculate the actual height for chart bars in pixels
-   * - Uses an absolute scale for better visualization
-   * - Minimum height for non-zero values is 30px
-   * - Maximum height is 160px
-   */
   calculateBarHeight(value: number): number {
-    if (value <= 0) return 2; // Minimal height for zero values
+    if (value <= 0) return 2;
 
-    const minHeight = 30; // Minimum height for non-zero values
-    const maxHeight = 160; // Maximum height for largest values
+    const minHeight = this.isMobile ? 20 : 30;
+    const maxHeight = this.isMobile ? 100 : 160;
 
     // Find the maximum value in the dataset
     const maxValue = Math.max(
@@ -310,13 +304,7 @@ export class DashboardComponent implements OnInit {
 
     if (maxValue === 0) return minHeight;
 
-    // Log the values for debugging
-    console.log(
-      `Value: ${value}, Max: ${maxValue}, Ratio: ${value / maxValue}`,
-    );
-
     // Calculate height using a logarithmic scale to make differences more visible
-    // This makes small values more visible compared to large values
     const heightRatio = Math.log(value + 1) / Math.log(maxValue + 1);
     const heightValue = minHeight + (maxHeight - minHeight) * heightRatio;
 

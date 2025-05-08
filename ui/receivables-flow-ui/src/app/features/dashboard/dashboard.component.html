@@ -110,6 +110,26 @@
                   <mat-icon>bar_chart_off</mat-icon>
                   <p>No data available</p>
                 </div>
+                <!-- Placeholder for future pie chart -->
+                <div class="pie-chart" *ngIf="assignorDistribution.length > 0">
+                  <div class="pie-segments">
+                    <div
+                      *ngFor="let item of assignorDistribution; let i = index"
+                      class="pie-segment"
+                      [style.background-color]="
+                        chartColors[i % chartColors.length]
+                      "
+                      [style.transform]="'rotate(' + i * 72 + 'deg)'"
+                      [style.clip-path]="
+                        'polygon(50% 50%, 50% 0%, ' +
+                        (50 + 50 * Math.sin(((i + 1) * 72 * Math.PI) / 180)) +
+                        '% ' +
+                        (50 - 50 * Math.cos(((i + 1) * 72 * Math.PI) / 180)) +
+                        '%, 50% 50%)'
+                      "
+                    ></div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="assignor-list">
@@ -139,7 +159,7 @@
         <div class="quick-actions">
           <button mat-raised-button color="primary" (click)="openDialog()">
             <mat-icon>payment</mat-icon>
-            Manage Payables
+            <span class="button-text">Manage Payables</span>
           </button>
           <button
             mat-raised-button
@@ -147,19 +167,24 @@
             [routerLink]="['/assignors']"
           >
             <mat-icon>business</mat-icon>
-            Manage Assignors
+            <span class="button-text">Manage Assignors</span>
           </button>
           <button mat-raised-button color="warn">
             <mat-icon>cloud_download</mat-icon>
-            Export Report
+            <span class="button-text">Export Report</span>
           </button>
         </div>
       </mat-card-content>
     </mat-card>
   </div>
 
-  <!-- Floating action button -->
-  <button mat-fab color="primary" class="add-button" (click)="openDialog()">
+  <!-- Floating action button (only show on small screens) -->
+  <button
+    mat-fab
+    color="primary"
+    class="add-button mobile-only"
+    (click)="openDialog()"
+  >
     <mat-icon>add</mat-icon>
   </button>
 </section>
