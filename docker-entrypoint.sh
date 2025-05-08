@@ -30,7 +30,7 @@ fi
 # Run migrations
 echo "Running database migrations..."
 if [ "$NODE_ENV" = "production" ]; then
-  node dist/shared/database/migration-runner.js
+  node dist/src/shared/database/migration-runner.js
 else
   npx ts-node -r tsconfig-paths/register src/shared/database/migration-runner.ts
 fi
