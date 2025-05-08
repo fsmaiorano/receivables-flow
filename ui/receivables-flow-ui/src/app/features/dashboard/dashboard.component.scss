@@ -1,13 +1,380 @@
 .dashboard {
   display: flex;
   flex-direction: column;
+  padding: 1.5rem;
+  position: relative;
+  min-height: calc(100vh - 64px);
+  background-color: #f5f7fa;
+}
 
-  > .add-button {
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+
+  p {
+    margin-top: 1rem;
+    color: #666;
+    font-size: 1rem;
+  }
+}
+
+.dashboard-content {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  .dashboard-subtitle {
+    color: #666;
+    font-size: 1rem;
+  }
+}
+
+// Stats Cards
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  border-radius: 12px;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+  }
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: white;
+  }
+
+  &.blue {
+    background-color: #4285f4;
+  }
+
+  &.green {
+    background-color: #34a853;
+  }
+
+  &.amber {
+    background-color: #fbbc05;
+  }
+
+  &.purple {
+    background-color: #8e24aa;
+  }
+}
+
+.stat-details {
+  display: flex;
+  flex-direction: column;
+
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    color: #333;
+  }
+
+  .stat-label {
+    color: #666;
+    font-size: 0.9rem;
+  }
+}
+
+// Charts Section
+.chart-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.chart-card {
+  border-radius: 12px;
+  height: 100%;
+  min-height: 300px;
+
+  mat-card-header {
+    padding: 1rem 1rem 0;
+
+    mat-card-title {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  mat-card-content {
+    padding: 1rem;
+    height: calc(100% - 70px);
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// Monthly Chart Styling
+.monthly-chart {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.chart-bars {
+  display: flex;
+  height: 200px;
+  align-items: flex-end;
+  justify-content: space-around;
+}
+
+.chart-bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0 5px;
+}
+
+.chart-bar {
+  width: 100%;
+  max-width: 50px;
+  min-height: 5px;
+  border-radius: 4px 4px 0 0;
+  background-color: #4285f4;
+  transition: height 0.5s ease-out;
+  position: relative;
+  display: flex;
+  justify-content: center;
+
+  &:hover .chart-tooltip {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+}
+
+.chart-tooltip {
+  position: absolute;
+  top: -35px;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: all 0.2s;
+  pointer-events: none;
+  white-space: nowrap;
+
+  &:after {
+    content: '';
     position: absolute;
-    z-index: 1000;
-    width: 70px;
-    height: 70px;
-    right: 50px;
-    bottom: 50px;
+    bottom: -5px;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px 5px 0;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.75) transparent transparent;
+  }
+}
+
+.chart-label {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+// Assignor Chart Styling
+.assignor-chart {
+  display: flex;
+  height: 100%;
+}
+
+.pie-container {
+  width: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie-placeholder {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+}
+
+.assignor-list {
+  width: 60%;
+  padding-left: 1rem;
+  overflow-y: auto;
+}
+
+.assignor-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 8px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+}
+
+.assignor-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+
+.assignor-name {
+  flex: 1;
+  font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.assignor-count {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+// Quick Actions
+.actions-card {
+  border-radius: 12px;
+  margin-bottom: 2rem;
+
+  mat-card-header {
+    padding: 1rem 1rem 0;
+  }
+
+  mat-card-content {
+    padding: 1rem;
+  }
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+// Floating Action Button
+.add-button {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  z-index: 1000;
+}
+
+// Responsive adjustments
+@media (max-width: 960px) {
+  .chart-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard {
+    padding: 1rem;
+  }
+
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .assignor-chart {
+    flex-direction: column;
+  }
+
+  .pie-container,
+  .assignor-list {
+    width: 100%;
+  }
+
+  .pie-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
   }
 }

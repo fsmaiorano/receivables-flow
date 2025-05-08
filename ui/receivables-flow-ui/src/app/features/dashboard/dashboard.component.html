@@ -1,6 +1,166 @@
 <section class="dashboard">
-  <p>dashboard works!</p>
-  <button mat-fab class="add-button" (click)="openDialog()">
+  <!-- Loading spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <div class="dashboard-content" *ngIf="!isLoading">
+    <!-- Welcome header -->
+    <div class="dashboard-header">
+      <h1>Dashboard</h1>
+      <p class="dashboard-subtitle">
+        Welcome to Receivables Flow management system
+      </p>
+    </div>
+
+    <!-- Stats overview cards -->
+    <div class="stats-cards">
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-icon blue">
+            <mat-icon>description</mat-icon>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ totalPayables | number }}</div>
+            <div class="stat-label">Total Payables</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-icon green">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ totalAssignors | number }}</div>
+            <div class="stat-label">Total Assignors</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-icon amber">
+            <mat-icon>monetization_on</mat-icon>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ totalAmount | currency }}</div>
+            <div class="stat-label">Total Amount</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-icon purple">
+            <mat-icon>update</mat-icon>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ recentActivity }}</div>
+            <div class="stat-label">Recent Activities</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Charts section -->
+    <div class="chart-container">
+      <!-- Monthly Payables Chart -->
+      <mat-card class="chart-card" appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Monthly Payables</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-placeholder monthly-chart">
+            <div class="chart-bars">
+              <ng-container *ngFor="let item of monthlyPayables; let i = index">
+                <div class="chart-bar-container">
+                  <div
+                    class="chart-bar"
+                    [style.height.%]="
+                      (item.amount / (monthlyPayables | max: 'amount')) * 100
+                    "
+                    [style.background-color]="
+                      chartColors[i % chartColors.length]
+                    "
+                  >
+                    <div class="chart-tooltip">
+                      {{ item.amount | currency }}
+                    </div>
+                  </div>
+                  <div class="chart-label">{{ item.month }}</div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Assignor Distribution Chart -->
+      <mat-card class="chart-card" appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Top Assignors</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="assignor-chart">
+            <div class="pie-container">
+              <div class="pie-placeholder">
+                <div class="no-data" *ngIf="assignorDistribution.length === 0">
+                  <mat-icon>bar_chart_off</mat-icon>
+                  <p>No data available</p>
+                </div>
+              </div>
+            </div>
+            <div class="assignor-list">
+              <div
+                class="assignor-item"
+                *ngFor="let item of assignorDistribution; let i = index"
+              >
+                <div
+                  class="assignor-color"
+                  [style.background-color]="chartColors[i % chartColors.length]"
+                ></div>
+                <div class="assignor-name">{{ item.name }}</div>
+                <div class="assignor-count">{{ item.count }} payables</div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick Actions -->
+    <mat-card class="actions-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Quick Actions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="quick-actions">
+          <button mat-raised-button color="primary" (click)="openDialog()">
+            <mat-icon>payment</mat-icon>
+            Manage Payables
+          </button>
+          <button
+            mat-raised-button
+            color="accent"
+            [routerLink]="['/assignors']"
+          >
+            <mat-icon>business</mat-icon>
+            Manage Assignors
+          </button>
+          <button mat-raised-button color="warn">
+            <mat-icon>cloud_download</mat-icon>
+            Export Report
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Floating action button -->
+  <button mat-fab color="primary" class="add-button" (click)="openDialog()">
     <mat-icon>add</mat-icon>
   </button>
 </section>
