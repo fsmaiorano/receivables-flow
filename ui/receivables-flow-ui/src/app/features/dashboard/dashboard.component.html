@@ -157,7 +157,11 @@
       </mat-card-header>
       <mat-card-content>
         <div class="quick-actions">
-          <button mat-raised-button color="primary" (click)="openDialog()">
+          <button
+            mat-raised-button
+            color="primary"
+            [routerLink]="['/payables']"
+          >
             <mat-icon>payment</mat-icon>
             <span class="button-text">Manage Payables</span>
           </button>
@@ -169,7 +173,7 @@
             <mat-icon>business</mat-icon>
             <span class="button-text">Manage Assignors</span>
           </button>
-          <button mat-raised-button color="warn">
+          <button mat-raised-button color="warn" [routerLink]="['/reports']">
             <mat-icon>cloud_download</mat-icon>
             <span class="button-text">Export Report</span>
           </button>
@@ -183,7 +187,7 @@
     mat-fab
     color="primary"
     class="add-button mobile-only"
-    (click)="openDialog()"
+    [routerLink]="['/payables']"
   >
     <mat-icon>add</mat-icon>
   </button>
