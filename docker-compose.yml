@@ -55,6 +55,23 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - app-network
+  ui:
+    build:
+      context: .
+      dockerfile: ./ui/receivables-flow-ui/Dockerfile
+    container_name: receivables-flow-ui
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    depends_on:
+      - api
+    networks:
+      - app-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 2048M
 
 volumes:
   sqlite_data:
