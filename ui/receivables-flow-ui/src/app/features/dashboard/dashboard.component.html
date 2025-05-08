@@ -73,21 +73,22 @@
           <mat-card-title>Monthly Payables</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <div class="chart-placeholder monthly-chart">
+          <div class="monthly-chart">
             <div class="chart-bars">
               <ng-container *ngFor="let item of monthlyPayables; let i = index">
                 <div class="chart-bar-container">
+                  <div class="chart-value">{{ item.amount | currency }}</div>
                   <div
                     class="chart-bar"
-                    [style.height.%]="getBarHeight(item.amount)"
-                    [style.background-color]="
-                      chartColors[i % chartColors.length]
-                    "
-                  >
-                    <div class="chart-tooltip">
-                      {{ item.amount | currency }}
-                    </div>
-                  </div>
+                    [ngClass]="{ 'has-value': item.amount > 0 }"
+                    [ngStyle]="{
+                      height:
+                        (item.amount > 0
+                          ? calculateBarHeight(item.amount)
+                          : '2') + 'px',
+                      'background-color': chartColors[i % chartColors.length],
+                    }"
+                  ></div>
                   <div class="chart-label">{{ item.month }}</div>
                 </div>
               </ng-container>

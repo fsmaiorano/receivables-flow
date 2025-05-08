@@ -13,6 +13,19 @@ import { AssignorService } from '../core/data/http/assignor/assignor.service';
 import { forkJoin, catchError, of } from 'rxjs';
 import { MaxPipe } from '../../shared/pipes/max.pipe';
 
+// Adding interfaces to fix type issues
+interface Payable {
+  id: string;
+  value: number | string;
+  emissionDate: string;
+  assignorId: string;
+}
+
+interface Assignor {
+  id: string;
+  name: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   imports: [SharedModule, MaxPipe],
@@ -276,6 +289,38 @@ export class DashboardComponent implements OnInit {
     if (percentage > 5) return 20;
 
     return percentage > 0 ? minHeight : 0;
+  }
+
+  /**
+   * Calculate the actual height for chart bars in pixels
+   * - Uses an absolute scale for better visualization
+   * - Minimum height for non-zero values is 30px
+   * - Maximum height is 160px
+   */
+  calculateBarHeight(value: number): number {
+    if (value <= 0) return 2; // Minimal height for zero values
+
+    const minHeight = 30; // Minimum height for non-zero values
+    const maxHeight = 160; // Maximum height for largest values
+
+    // Find the maximum value in the dataset
+    const maxValue = Math.max(
+      ...this.monthlyPayables.map((item) => item.amount),
+    );
+
+    if (maxValue === 0) return minHeight;
+
+    // Log the values for debugging
+    console.log(
+      `Value: ${value}, Max: ${maxValue}, Ratio: ${value / maxValue}`,
+    );
+
+    // Calculate height using a logarithmic scale to make differences more visible
+    // This makes small values more visible compared to large values
+    const heightRatio = Math.log(value + 1) / Math.log(maxValue + 1);
+    const heightValue = minHeight + (maxHeight - minHeight) * heightRatio;
+
+    return Math.round(heightValue);
   }
 
   openDialog() {
