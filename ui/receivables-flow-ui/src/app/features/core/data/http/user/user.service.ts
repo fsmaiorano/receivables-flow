@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { AuthenticationResponse } from './dto/sign-in.response';
 import { Observable } from 'rxjs';
 import { Result } from '../../../dto/result.generic';
+import { environment } from '../../../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,7 @@ export class UserService {
     password: string,
   ): Observable<Result<AuthenticationResponse>> {
     return this.http.post<Result<AuthenticationResponse>>(
-      'http://localhost:3333/auth/signIn',
+      `${environment.apiUrl}/auth/signIn`,
       {
         email,
         password,

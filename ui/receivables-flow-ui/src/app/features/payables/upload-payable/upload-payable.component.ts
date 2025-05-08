@@ -6,6 +6,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { StoreService } from '../../core/store/store.service';
 import { finalize } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment.development';
 
 @Component({
   selector: 'app-upload-payable',
@@ -116,7 +117,7 @@ export class UploadPayableComponent implements OnInit {
     });
 
     this.http
-      .post('http://localhost:3333/integrations/payable/batch/csv', formData, {
+      .post(`${environment.apiUrl}/integrations/payable/batch/csv`, formData, {
         headers,
         reportProgress: true,
         observe: 'events',

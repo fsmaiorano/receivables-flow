@@ -6,6 +6,7 @@ import { Result } from '../../../dto/result.generic';
 import { AssignorResponse } from './dto/assignors.response';
 import { CreateAssignorRequest } from './dto/create-assignor.request';
 import { StoreService } from '../../../store/store.service';
+import { environment } from '../../../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +32,7 @@ export class AssignorService {
     const options = {
       headers: this.getAuthorizationHeaders(),
     };
-    let url = `http://localhost:3333/integrations/assignor?page=${page - 1}&pageSize=${pageSize}`;
+    let url = `${environment.apiUrl}/integrations/assignor?page=${page - 1}&pageSize=${pageSize}`;
 
     if (filter) {
       url += `&filter=${encodeURIComponent(filter)}`;
@@ -51,7 +52,7 @@ export class AssignorService {
     };
 
     return this.http.get<Result<AssignorResponse>>(
-      `http://localhost:3333/integrations/assignor/${id}`,
+      `${environment.apiUrl}/integrations/assignor/${id}`,
       options,
     );
   }
@@ -64,7 +65,7 @@ export class AssignorService {
     };
 
     return this.http.post<Result<AssignorResponse>>(
-      `http://localhost:3333/integrations/assignor`,
+      `${environment.apiUrl}/integrations/assignor`,
       assignor,
       options,
     );
@@ -79,7 +80,7 @@ export class AssignorService {
     };
 
     return this.http.put<Result<AssignorResponse>>(
-      `http://localhost:3333/integrations/assignor/${id}`,
+      `${environment.apiUrl}/integrations/assignor/${id}`,
       assignor,
       options,
     );
@@ -91,7 +92,7 @@ export class AssignorService {
     };
 
     return this.http.delete<Result<AssignorResponse>>(
-      `http://localhost:3333/integrations/assignor/${id}`,
+      `${environment.apiUrl}/integrations/assignor/${id}`,
       options,
     );
   }

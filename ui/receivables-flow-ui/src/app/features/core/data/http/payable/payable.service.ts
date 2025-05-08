@@ -6,6 +6,7 @@ import { Result } from '../../../dto/result.generic';
 import { PayableResponse } from './dto/payable.response';
 import { CreatePayableRequest } from './dto/create-payable.request';
 import { StoreService } from '../../../store/store.service';
+import { environment } from '../../../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +32,7 @@ export class PayableService {
     const options = {
       headers: this.getAuthorizationHeaders(),
     };
-    let url = `http://localhost:3333/integrations/payable?page=${page - 1}&pageSize=${pageSize}`;
+    let url = `${environment.apiUrl}/integrations/payable?page=${page - 1}&pageSize=${pageSize}`;
 
     if (filter) {
       url += `&filter=${encodeURIComponent(filter)}`;
@@ -51,7 +52,7 @@ export class PayableService {
     };
 
     return this.http.get<Result<PayableResponse>>(
-      `http://localhost:3333/integrations/payable/${id}`,
+      `${environment.apiUrl}/integrations/payable/${id}`,
       options,
     );
   }
@@ -64,7 +65,7 @@ export class PayableService {
     };
 
     return this.http.post<Result<PayableResponse>>(
-      `http://localhost:3333/integrations/payable`,
+      `${environment.apiUrl}/integrations/payable`,
       payable,
       options,
     );
@@ -79,7 +80,7 @@ export class PayableService {
     };
 
     return this.http.put<Result<PayableResponse>>(
-      `http://localhost:3333/integrations/payable/${id}`,
+      `${environment.apiUrl}/integrations/payable/${id}`,
       payable,
       options,
     );
@@ -91,7 +92,7 @@ export class PayableService {
     };
 
     return this.http.delete<Result<PayableResponse>>(
-      `http://localhost:3333/integrations/payable/${id}`,
+      `${environment.apiUrl}/integrations/payable/${id}`,
       options,
     );
   }
