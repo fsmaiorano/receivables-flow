@@ -14,6 +14,7 @@ import { Result } from '../core/dto/result.generic';
 import { PayableResponse } from '../core/data/http/payable/dto/payable.response';
 import { DetailPayableComponent } from './detail-payable/detail-payable.component';
 import { UploadPayableComponent } from './upload-payable/upload-payable.component';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 
 interface Payable {
   id: string;
@@ -26,7 +27,7 @@ interface Payable {
 
 @Component({
   selector: 'app-payables',
-  imports: [SharedModule],
+  imports: [SharedModule, BreadcrumbComponent],
   templateUrl: './payables.component.html',
   styleUrl: './payables.component.scss',
   standalone: true,

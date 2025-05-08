@@ -13,10 +13,11 @@ import { FormBuilder } from '@angular/forms';
 import { MatSidenav } from '@angular/material/sidenav';
 import { SidenavService } from '../../shared/services/sidenav.service';
 import { Subscription } from 'rxjs';
+import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 
 @Component({
   selector: 'app-sidenav',
-  imports: [SharedModule],
+  imports: [SharedModule, BreadcrumbComponent],
   templateUrl: './sidenav.component.html',
   styleUrl: './sidenav.component.scss',
   standalone: true,
@@ -39,12 +40,10 @@ export class SidenavComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Inscreve-se no evento de toggle do sidenav
     this.sidenavSubscription.add(
       this.sidenavService.toggleSidenav$.subscribe(() => {
         if (this.sidenav) {
           this.sidenav.toggle();
-          // Notifica o serviço sobre a mudança de estado
           this.sidenavService.notifyStateChange(this.sidenav.opened);
         }
       }),
@@ -52,7 +51,6 @@ export class SidenavComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // Configura os listeners após o ViewChild ser inicializado
     this.setupSidenavEventListeners();
     this.checkScreenSize();
   }

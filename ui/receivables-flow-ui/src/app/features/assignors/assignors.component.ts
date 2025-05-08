@@ -12,6 +12,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AssignorResponse } from '../core/data/http/assignor/dto/assignors.response';
 import { PaginatedResponseDto } from '../core/dto/pagination.response';
 import { Result } from '../core/dto/result.generic';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 
 export interface Assignor {
   id: string;
@@ -23,9 +24,10 @@ export interface Assignor {
 
 @Component({
   selector: 'app-assignors',
-  imports: [SharedModule],
+  imports: [SharedModule, BreadcrumbComponent],
   templateUrl: './assignors.component.html',
   styleUrl: './assignors.component.scss',
+  standalone: true,
 })
 export class AssignorsComponent implements OnInit, AfterViewInit {
   assignors = new MatTableDataSource<Assignor>([]);

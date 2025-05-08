@@ -1,12 +1,11 @@
 <section class="dashboard">
-  <!-- Loading spinner -->
   <div class="loading-container" *ngIf="isLoading">
     <mat-spinner diameter="50"></mat-spinner>
-    <p>Loading dashboard data...</p>
   </div>
 
   <div class="dashboard-content" *ngIf="!isLoading">
-    <!-- Welcome header -->
+    <app-breadcrumb></app-breadcrumb>
+
     <div class="dashboard-header">
       <h1>Dashboard</h1>
       <p class="dashboard-subtitle">
@@ -14,7 +13,6 @@
       </p>
     </div>
 
-    <!-- Stats overview cards -->
     <div class="stats-cards">
       <mat-card class="stat-card" appearance="outlined">
         <mat-card-content>
@@ -181,14 +179,4 @@
       </mat-card-content>
     </mat-card>
   </div>
-
-  <!-- Floating action button (only show on small screens) -->
-  <button
-    mat-fab
-    color="primary"
-    class="add-button mobile-only"
-    [routerLink]="['/payables']"
-  >
-    <mat-icon>add</mat-icon>
-  </button>
 </section>

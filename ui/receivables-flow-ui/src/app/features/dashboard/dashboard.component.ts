@@ -13,10 +13,11 @@ import { PayableService } from '../core/data/http/payable/payable.service';
 import { AssignorService } from '../core/data/http/assignor/assignor.service';
 import { forkJoin, catchError, of } from 'rxjs';
 import { MaxPipe } from '../../shared/pipes/max.pipe';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [SharedModule, MaxPipe],
+  imports: [SharedModule, MaxPipe, BreadcrumbComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
