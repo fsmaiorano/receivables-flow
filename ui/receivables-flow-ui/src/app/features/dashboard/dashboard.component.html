@@ -79,9 +79,7 @@
                 <div class="chart-bar-container">
                   <div
                     class="chart-bar"
-                    [style.height.%]="
-                      (item.amount / (monthlyPayables | max: 'amount')) * 100
-                    "
+                    [style.height.%]="getBarHeight(item.amount)"
                     [style.background-color]="
                       chartColors[i % chartColors.length]
                     "

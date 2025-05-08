@@ -34,16 +34,14 @@ export class DashboardComponent implements OnInit {
   recentActivity = 10;
   isLoading = true;
 
-  // Chart data
   monthlyPayables: { month: string; amount: number }[] = [];
   assignorDistribution: { name: string; count: number }[] = [];
 
-  // Random colors for charts
   chartColors: string[] = [
     '#4285F4',
     '#EA4335',
     '#FBBC05',
-    '#34A853', // Google colors
+    '#34A853',
     '#7986CB',
     '#33B679',
     '#8E24AA',
@@ -242,6 +240,42 @@ export class DashboardComponent implements OnInit {
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
+  }
+
+  /**
+   * Calculate the height percentage for chart bars
+   * - Ensures a minimum height of 5% for non-zero values
+   * - Scales other bars proportionally based on the max value
+   * - Returns 0 for zero values
+   */
+  getBarHeight(value: number): number {
+    if (value === 0) return 0;
+
+    // Find maximum value
+    const maxValue = Math.max(
+      ...this.monthlyPayables.map((item) => item.amount),
+    );
+
+    if (maxValue === 0) return 0;
+
+    // For debugging
+    console.log(
+      `Bar value: ${value}, Max value: ${maxValue}, Percentage: ${(value / maxValue) * 100}`,
+    );
+
+    // Calculate percentage height (min 5% if non-zero value)
+    // We use a logarithmic scale to make differences more visible
+    const minHeight = 5;
+    const percentage = (value / maxValue) * 100;
+
+    // Create more visual difference between values
+    if (percentage > 80) return 100;
+    if (percentage > 60) return 80;
+    if (percentage > 40) return 60;
+    if (percentage > 20) return 40;
+    if (percentage > 5) return 20;
+
+    return percentage > 0 ? minHeight : 0;
   }
 
   openDialog() {
